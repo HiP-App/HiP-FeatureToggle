@@ -1,13 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.PlatformAbstractions;
+using System;
+using System.IO;
+using System.Text;
+using Swashbuckle.AspNetCore.Swagger;
 
+using de.uni_paderborn.si_lab.hip.featuretoggle.data;
 using de.uni_paderborn.si_lab.hip.featuretoggle.utility;
 
 namespace de.uni_paderborn.si_lab.hip.featuretoggle
@@ -34,10 +37,11 @@ namespace de.uni_paderborn.si_lab.hip.featuretoggle
             // Inject a configuration with the properties from AppConfig that
             // match the given Configuration (which was loaded in the constructor).
             services.Configure<AppConfig>(Configuration);
-
+            
             // Add Cross Orign Requests 
             services.AddCors();
-
+            
+            services.AddDbContext<ToggleDbContext>(options => options.UseNpgsql(AppConfig.BuildConnectionString(Configuration)));
 
             // Add framework services.
             services.AddMvc();
