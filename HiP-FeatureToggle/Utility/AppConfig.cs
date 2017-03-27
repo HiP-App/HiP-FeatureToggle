@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Microsoft.Extensions.Configuration;
 
-namespace de.uni_paderborn.si_lab.hip.featuretoggles.utility
+namespace de.uni_paderborn.si_lab.hip.featuretoggle.utility
 {
     public class AppConfig
     {

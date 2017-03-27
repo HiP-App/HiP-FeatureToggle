@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Swashbuckle.AspNetCore.Swagger;
 
-namespace de.uni_paderborn.si_lab.hip.featuretoggles.utility
+namespace de.uni_paderborn.si_lab.hip.featuretoggle.utility
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class AuthFilter: IOperationFilter

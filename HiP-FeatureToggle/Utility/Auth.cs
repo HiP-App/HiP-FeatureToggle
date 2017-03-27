@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Security.Principal;
 
-namespace de.uni_paderborn.si_lab.hip.featuretoggles.utility
+namespace de.uni_paderborn.si_lab.hip.featuretoggle.utility
 {
 	public static class Auth
 	{
