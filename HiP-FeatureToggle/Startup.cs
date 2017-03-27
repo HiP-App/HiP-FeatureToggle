@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace HiP_FeatureToggle
+namespace de.uni_paderborn.si_lab.hip.featuretoggle
 {
     public class Startup
     {
