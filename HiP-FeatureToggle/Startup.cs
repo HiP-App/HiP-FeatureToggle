@@ -14,12 +14,14 @@ namespace de.uni_paderborn.si_lab.hip.featuretoggle
     {
         public Startup(IHostingEnvironment env)
         {
-            var builder = new ConfigurationBuilder()
+            // load both the appsettings and the appsettings.Development /
+            // appsettings.Production files into the Configuration attribute
+            var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
-            Configuration = builder.Build();
+            Configuration = configurationBuilder.Build();
         }
 
         public IConfigurationRoot Configuration { get; }
