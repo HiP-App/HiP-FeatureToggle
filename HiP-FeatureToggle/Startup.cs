@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+using de.uni_paderborn.si_lab.hip.featuretoggle.utility;
+
 namespace de.uni_paderborn.si_lab.hip.featuretoggle
 {
     public class Startup
@@ -29,6 +31,10 @@ namespace de.uni_paderborn.si_lab.hip.featuretoggle
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Inject a configuration with the properties from AppConfig that
+            // match the given Configuration that was loaded in the constructor.
+            services.Configure<AppConfig>(Configuration);
+
             // Add framework services.
             services.AddMvc();
         }
