@@ -32,8 +32,12 @@ namespace de.uni_paderborn.si_lab.hip.featuretoggle
         public void ConfigureServices(IServiceCollection services)
         {
             // Inject a configuration with the properties from AppConfig that
-            // match the given Configuration that was loaded in the constructor.
+            // match the given Configuration (which was loaded in the constructor).
             services.Configure<AppConfig>(Configuration);
+
+            // Add Cross Orign Requests 
+            services.AddCors();
+
 
             // Add framework services.
             services.AddMvc();
