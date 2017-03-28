@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 
-namespace de.uni_paderborn.si_lab.hip.featuretoggle.controllers
+namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 {
     [Route("api/[controller]")]
     public class ValuesController : Controller

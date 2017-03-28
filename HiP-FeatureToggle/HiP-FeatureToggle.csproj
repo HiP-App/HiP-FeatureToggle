@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
-    <RootNamespace>de.uni_paderborn.si_lab.hip.featuretoggle</RootNamespace>
+    <RootNamespace>PaderbornUniversity.SILab.Hip.FeatureToggle</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

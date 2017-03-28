@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace de.uni_paderborn.si_lab.hip.featuretoggle.data
+namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Data
 {
     public class ToggleDbContext: DbContext
     {

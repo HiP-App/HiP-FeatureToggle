@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 
-namespace de.uni_paderborn.si_lab.hip.featuretoggle
+namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 {
     public class Program
     {

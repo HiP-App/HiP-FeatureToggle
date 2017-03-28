@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,10 +10,10 @@ using System.IO;
 using System.Text;
 using Swashbuckle.AspNetCore.Swagger;
 
-using de.uni_paderborn.si_lab.hip.featuretoggle.data;
-using de.uni_paderborn.si_lab.hip.featuretoggle.utility;
+using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
+using PaderbornUniversity.SILab.Hip.FeatureToggle.Utility;
 
-namespace de.uni_paderborn.si_lab.hip.featuretoggle
+namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 {
     public class Startup
     {

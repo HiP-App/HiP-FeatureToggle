@@ -3,7 +3,7 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace de.uni_paderborn.si_lab.hip.featuretoggle.utility
+namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Utility
 {
 	public class CmsApiBearerEvents: JwtBearerEvents
 {
