@@ -17,6 +17,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 {
     public class Startup
     {
+		private const string _Version = "v1";
+		private const string _Name = "HiP Feature Toggle API";
+
         public Startup(IHostingEnvironment env)
         {
             // load both the appsettings and the appsettings.Development /
@@ -41,7 +44,17 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             // Add Cross Orign Requests 
             services.AddCors();
             
-            services.AddDbContext<ToggleDbContext>(options => options.UseNpgsql(AppConfig.BuildConnectionString(Configuration)));
+            services.AddDbContext<ToggleDbContext>(
+				options => options.UseNpgsql(AppConfig.BuildConnectionString(Configuration))
+			);
+
+			// Register the Swagger generator
+            services.AddSwaggerGen(c =>
+			{
+				// Define a Swagger document
+				c.SwaggerDoc("v1", new Info() { Title = _Name, Version = _Version });
+				c.OperationFilter<SwaggerOperationFilter>();
+			});
 
             // Add framework services.
             services.AddMvc();
@@ -54,6 +67,18 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             loggerFactory.AddDebug();
 
             app.UseMvc();
+
+			// Enable middleware to serve generated Swagger as a JSON endpoint
+            app.UseSwagger(c =>
+			{
+				c.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.Host = httpReq.Host.Value);
+			});
+			app.UseSwaggerUI(c =>
+			{
+				// TODO: Only a hack, if HiP-Swagger is running, SwaggerUI can be disabled for Production
+				c.SwaggerEndpoint((env.IsDevelopment() ? "/swagger" : "..") +
+				                  "/" + _Version + "/swagger.json", _Name + _Version);
+			});
         }
     }
 }

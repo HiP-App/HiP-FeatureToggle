@@ -15,7 +15,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public string Get(int id)
+		public string Get([FromRoute]int id)
         {
             return "value for " + id;
         }
@@ -34,7 +34,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void Delete([FromRoute]int id)
         {
         }
     }
