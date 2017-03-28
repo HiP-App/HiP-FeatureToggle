@@ -12,6 +12,7 @@ using Swashbuckle.AspNetCore.Swagger;
 
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Utility;
+using Microsoft.Extensions.Options;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 {
@@ -61,8 +62,15 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-        {
+        public void Configure(
+			IApplicationBuilder app,
+			IHostingEnvironment env,
+			ILoggerFactory loggerFactory,
+			IOptions<AppConfig> appConfig
+		) {
+			// Retrieve the AppConfig reference from the IOptions type:
+			var config = appConfig.Value;
+
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
 			if (env.IsDevelopment())
 			{
@@ -75,6 +83,17 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 					   .AllowAnyMethod()
 					   .AllowAnyOrigin()
 			);
+
+			// Configure JWT-based authentication using the configuration values from appsettings*.json
+            app.UseJwtBearerAuthentication(new JwtBearerOptions
+			{
+				Audience = config.CLIENT_ID,
+				Authority = config.DOMAIN,
+				AutomaticChallenge = true,
+				AutomaticAuthenticate = true,
+				RequireHttpsMetadata = !Convert.ToBoolean(config.ALLOW_HTTP),
+				Events = new BearerEvents()
+			});
 
             app.UseMvc();
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Utility
 {
-	public class CmsApiBearerEvents: JwtBearerEvents
+	public class BearerEvents: JwtBearerEvents
 {
 	public override Task AuthenticationFailed(AuthenticationFailedContext context)
 	{
