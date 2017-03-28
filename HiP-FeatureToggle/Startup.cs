@@ -64,15 +64,28 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+			if (env.IsDevelopment())
+			{
+				loggerFactory.AddDebug();
+			}
+
+			// Configure CORS - TODO: Only allow calls from docker-hip.cs.uni-paderborn.de (and from localhost if in dev mode)
+			app.UseCors(builder =>
+				builder.AllowAnyHeader()
+					   .AllowAnyMethod()
+					   .AllowAnyOrigin()
+			);
 
             app.UseMvc();
+
+			// Swagger / Swashbuckle configuration:
 
 			// Enable middleware to serve generated Swagger as a JSON endpoint
             app.UseSwagger(c =>
 			{
 				c.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.Host = httpReq.Host.Value);
 			});
+			// Configure SwaggerUI endpoint
 			app.UseSwaggerUI(c =>
 			{
 				// TODO: Only a hack, if HiP-Swagger is running, SwaggerUI can be disabled for Production
