@@ -12,9 +12,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Utility
 	/// relevant information (in this case, whether the user is already authorized
 	/// and whether anonymous access is allowed) and then updates the Swagger 
 	/// Operation by adding an Authorization field in which the user can input
-	/// an access token. 
-	/// 
-	/// TODO: Add a filter that adds a 401 error code information? see https://github.com/domaindrivendev/Swashbuckle.AspNetCore#operation-filters
+	/// an access token.
 	/// </summary>
 	public class SwaggerOperationFilter : IOperationFilter
 	{
@@ -37,6 +35,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Utility
 				Required = true,
 				Type = "string"
 			});
+			operation.Responses.Add("401", new Response { Description = "Unauthorized" });
 		}
 	}
 }
