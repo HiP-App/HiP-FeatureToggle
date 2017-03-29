@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.PlatformAbstractions;
 using System;
 using System.IO;
@@ -12,7 +13,6 @@ using Swashbuckle.AspNetCore.Swagger;
 
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Utility;
-using Microsoft.Extensions.Options;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 {
@@ -66,7 +66,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 			IApplicationBuilder app,
 			IHostingEnvironment env,
 			ILoggerFactory loggerFactory,
-			IOptions<AppConfig> appConfig
+			IOptions<AppConfig> appConfig,
+			ToggleDbContext dbContext
 		) {
 			// Retrieve the AppConfig reference from the IOptions type:
 			var config = appConfig.Value;
@@ -111,6 +112,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 				c.SwaggerEndpoint((env.IsDevelopment() ? "/swagger" : "..") +
 				                  "/" + _Version + "/swagger.json", _Name + _Version);
 			});
+
+			// Run migrations
+			dbContext.Database.Migrate();
         }
     }
 }
