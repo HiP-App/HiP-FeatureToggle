@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 {
+	/// <summary>
+	/// Sample Values controller -- remove for actual service implementation.
+	/// </summary>
     [Route("api/[controller]")]
 	[Authorize]
     public class ValuesController : Controller

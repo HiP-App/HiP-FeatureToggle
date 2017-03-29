@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PaderbornUniversity.SILab.Hip.FeatureToggle.Models;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Data
 {
@@ -9,6 +10,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Data
          * Example:
          * public DbSet<AssociatedTopic> AssociatedTopics { get; set; }
          */
+
+		public DbSet<Values> Values { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             /*
