@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 {
     [Route("api/[controller]")]
+	[Authorize]
     public class ValuesController : Controller
     {
         // GET api/values
