@@ -13,6 +13,7 @@ using Swashbuckle.AspNetCore.Swagger;
 
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Utility;
+using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 {
@@ -59,6 +60,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 
             // Add framework services.
             services.AddMvc();
+
+			// Add managers
+			services.AddTransient<ValuesManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

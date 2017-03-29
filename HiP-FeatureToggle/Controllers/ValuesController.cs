@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.Text;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
+using System;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 {
@@ -10,25 +13,33 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
     [Route("api/[controller]")]
 	[Authorize]
     public class ValuesController : Controller
-    {
+    {		private readonly ValuesManager _manager;
+
+
+		public ValuesController(ValuesManager manager): base()
+		{
+			_manager = manager;
+		}
+
         // GET api/values
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            return new string[] { "value1", "value2" };
+			return _manager.Get();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
 		public string Get([FromRoute]int id)
         {
-            return "value for " + id;
+			return "";
         }
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        public void Post([FromBody]string val)
         {
+			_manager.Add(val);
         }
 
         // PUT api/values/5
