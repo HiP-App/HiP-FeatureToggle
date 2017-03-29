@@ -11,8 +11,8 @@ using System.IO;
 using System.Text;
 using Swashbuckle.AspNetCore.Swagger;
 
+using PaderbornUniversity.SILab.Hip.Webservice;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
-using PaderbornUniversity.SILab.Hip.FeatureToggle.Utility;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle
