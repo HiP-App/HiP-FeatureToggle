@@ -82,7 +82,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 				loggerFactory.AddDebug();
 			}
 
-			// Configure CORS - TODO: Only allow calls from docker-hip.cs.uni-paderborn.de (and from localhost if in dev mode)
 			app.UseCors(builder =>
 				builder.AllowAnyHeader()
 					   .AllowAnyMethod()
