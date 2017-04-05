@@ -62,7 +62,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             services.AddMvc();
 
             // Add managers
-            services.AddTransient<ValuesManager>();
             services.AddTransient<FeatureGroupsManager>();
         }
 
