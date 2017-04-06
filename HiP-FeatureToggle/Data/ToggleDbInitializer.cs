@@ -15,10 +15,17 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Data
 
             var defaultGroup = new FeatureGroup
             {
-                Name = "Default"
+                Name = FeatureGroup.DefaultGroupName,
+                IsProtected = true
             };
 
-            db.FeatureGroups.Add(defaultGroup);
+            var publicGroup = new FeatureGroup
+            {
+                Name = FeatureGroup.PublicGroupName,
+                IsProtected = true
+            };
+
+            db.FeatureGroups.AddRange(defaultGroup, publicGroup);
             db.SaveChanges();
         }
     }

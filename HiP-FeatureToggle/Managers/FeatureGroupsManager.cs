@@ -20,12 +20,21 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
         private readonly ToggleDbContext _db;
 
+        /// <summary>
+        /// The default group for authorized users.
+        /// </summary>
         public FeatureGroup DefaultGroup { get; }
+
+        /// <summary>
+        /// The group for unauthorized users.
+        /// </summary>
+        public FeatureGroup PublicGroup { get; }
 
         public FeatureGroupsManager(ToggleDbContext db)
         {
             _db = db;
-            DefaultGroup = db.FeatureGroups.Single(g => g.Name == "Default");
+            DefaultGroup = db.FeatureGroups.Single(g => g.Name == FeatureGroup.DefaultGroupName);
+            PublicGroup = db.FeatureGroups.Single(g => g.Name == FeatureGroup.PublicGroupName);
         }
 
         public User GetOrCreateUser(string userId)
@@ -88,13 +97,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
         public bool RemoveGroup(int groupId)
         {
-            // the default group itself can't be removed
-            if (groupId == DefaultGroup.Id)
-                return false;
-
             var group = GetGroup(groupId, loadMembers: true);
 
-            if (group == null)
+            if (group == null || group.IsProtected)
                 return false;
 
             // before removing, move all group members to the default group
