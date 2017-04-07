@@ -24,7 +24,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         public IActionResult GetAll()
         {
             var groups = _manager.GetGroups(loadMembers: true, loadFeatures: true);
-            var results = groups.Select(g => new FeatureGroupResult(g));
+            var results = groups.ToList().Select(g => new FeatureGroupResult(g)); // note: ToList() is required here
             return Ok(results);
         }
 
@@ -80,7 +80,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             return BadRequest();
         }
 
-        [HttpPut("/Users/{userId}/FeatureGroup/{groupId}")]
+        [HttpPut("/api/Users/{userId}/FeatureGroup/{groupId}")]
         public IActionResult AssignMember(string userId, int groupId)
         {
             var user = _manager.GetOrCreateUser(userId);

@@ -33,8 +33,11 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
         public FeatureGroupsManager(ToggleDbContext db)
         {
             _db = db;
-            DefaultGroup = db.FeatureGroups.Single(g => g.Name == FeatureGroup.DefaultGroupName);
-            PublicGroup = db.FeatureGroups.Single(g => g.Name == FeatureGroup.PublicGroupName);
+
+            // Load standard groups which are always available and can't be deleted.
+            // If this fails, the database is not correctly initialized.
+            DefaultGroup = GetGroups(true, true).Single(g => g.Name == FeatureGroup.DefaultGroupName);
+            PublicGroup = GetGroups(true, true).Single(g => g.Name == FeatureGroup.PublicGroupName);
         }
 
         public User GetOrCreateUser(string userId)
@@ -68,7 +71,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             return storedFeatures;
         }
 
-        public IEnumerable<FeatureGroup> GetGroups(bool loadMembers = false, bool loadFeatures = false)
+        public IQueryable<FeatureGroup> GetGroups(bool loadMembers = false, bool loadFeatures = false)
         {
             return _db.FeatureGroups
                 .IncludeIf(loadMembers, nameof(FeatureGroup.Members))

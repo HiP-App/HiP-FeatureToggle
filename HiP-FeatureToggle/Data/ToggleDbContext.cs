@@ -28,6 +28,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Data
              */
             modelBuilder.Entity<FeatureToFeatureGroupMapping>()
                 .HasKey(m => new { m.FeatureId, m.GroupId });
+
+            modelBuilder.Entity<FeatureGroup>()
+                .HasIndex(group => group.Name);
         }
     }
 }
