@@ -12,5 +12,10 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.FeatureGroups
         /// IDs of features that are enabled in this group.
         /// </summary>
         public IList<int> EnabledFeatures { get; set; }
+
+        /// <summary>
+        /// IDs of users that are assigned to this group.
+        /// </summary>
+        public IList<string> Members { get; set; }
     }
 }

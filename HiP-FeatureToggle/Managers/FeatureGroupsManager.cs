@@ -55,6 +55,26 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             return newUser;
         }
 
+        public IEnumerable<User> GetOrCreateUsers(IEnumerable<string> userIds)
+        {
+            if (userIds == null)
+                return _noUsers;
+
+            var userIdsSet = userIds.ToSet();
+            var storedUsers = _db.Users.Where(u => userIdsSet.Contains(u.Id)).ToList();
+            var missingUserIds = userIdsSet.Except(storedUsers.Select(u => u.Id));
+
+            if (missingUserIds.Any())
+            {
+                // Create missing users
+                var newUsers = missingUserIds.Select(id => CreateUser(id)).ToList();
+                _db.SaveChanges();
+                return storedUsers.Concat(newUsers);
+            }
+
+            return storedUsers;
+        }
+
         /// <exception cref="ArgumentException">No features exist for one or multiple of the specified IDs</exception>
         public IReadOnlyCollection<Feature> GetFeatures(IEnumerable<int> featureIds)
         {
@@ -93,6 +113,11 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
             if (_db.FeatureGroups.Any(g => g.Name == group.Name))
                 throw new ArgumentException($"A feature group with name '{group.Name}' already exists");
+
+            // "pre-assigned" members of the new group might - until now - be assigned to another group
+            // => we have to correctly detach from the old group
+            foreach (var user in group.Members.ToList())
+                MoveUserToGroupCore(user, group);
 
             _db.FeatureGroups.Add(group);
             _db.SaveChanges();

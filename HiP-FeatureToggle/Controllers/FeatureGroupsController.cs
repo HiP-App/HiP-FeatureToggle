@@ -88,6 +88,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
                     .Select(f => new FeatureToFeatureGroupMapping(f, newGroup))
                     .ToList();
 
+                newGroup.Members = _manager.GetOrCreateUsers(groupVM.Members).ToList();
+
                 _manager.AddGroup(newGroup);
                 return Ok();
             }
