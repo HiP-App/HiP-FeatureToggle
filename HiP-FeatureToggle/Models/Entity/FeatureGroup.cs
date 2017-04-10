@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Collections.Generic;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Entity
 {
@@ -26,5 +27,13 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Entity
 
         public override string ToString() =>
             $"'{Name}' ({Members?.Count ?? 0} members, {EnabledFeatures?.Count ?? 0} features)";
+    }
+
+    public static class FeatureGroupMap
+    {
+        public static void Configure(this EntityTypeBuilder<FeatureGroup> entityBuilder)
+        {
+            entityBuilder.HasIndex(group => group.Name);
+        }
     }
 }

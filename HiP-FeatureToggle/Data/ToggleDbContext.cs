@@ -26,11 +26,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Data
              * modelBuilder.Entity<User>().HasIndex(b => b.Email).IsUnique();
              * new AssociatedTopicMap(modelBuilder.Entity<AssociatedTopic>());
              */
-            modelBuilder.Entity<FeatureToFeatureGroupMapping>()
-                .HasKey(m => new { m.FeatureId, m.GroupId });
-
-            modelBuilder.Entity<FeatureGroup>()
-                .HasIndex(group => group.Name);
+            modelBuilder.Entity<FeatureToFeatureGroupMapping>().Configure();
+            modelBuilder.Entity<FeatureGroup>().Configure();
         }
     }
 }
