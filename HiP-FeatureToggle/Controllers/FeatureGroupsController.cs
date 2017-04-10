@@ -21,6 +21,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         private readonly FeatureGroupsManager _manager;
         private readonly CmsService _cmsService;
 
+        private bool IsAdministrator => _cmsService.GetUserRole(User.Identity.GetUserIdentity()) == "Administrator";
+
         public FeatureGroupsController(FeatureGroupsManager manager, CmsService cmsService)
         {
             _manager = manager;
@@ -33,9 +35,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<FeatureGroupResult>), 200)]
         [ProducesResponseType(403)]
-        public IActionResult GetAll([FromQuery]string identity)
+        public IActionResult GetAll()
         {
-            if (!IsAdministrator(identity))
+            if (!IsAdministrator)
                 return Forbid();
 
             var groups = _manager.GetGroups(loadMembers: true, loadFeatures: true);
@@ -49,9 +51,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [HttpGet("{groupId}")]
         [ProducesResponseType(typeof(FeatureGroupResult), 200)]
         [ProducesResponseType(403)]
-        public IActionResult GetById([FromQuery]string identity, int groupId)
+        public IActionResult GetById(int groupId)
         {
-            if (!IsAdministrator(identity))
+            if (!IsAdministrator)
                 return Forbid();
 
             var group = _manager.GetGroup(groupId, loadMembers: true, loadFeatures: true);
@@ -70,9 +72,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
-        public IActionResult Create([FromQuery]string identity, [FromBody]FeatureGroupViewModel groupVM)
+        public IActionResult Create([FromBody]FeatureGroupViewModel groupVM)
         {
-            if (!IsAdministrator(identity))
+            if (!IsAdministrator)
                 return Forbid();
 
             if (!ModelState.IsValid)
@@ -102,9 +104,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
-        public IActionResult Delete([FromQuery]string identity, int groupId)
+        public IActionResult Delete(int groupId)
         {
-            if (!IsAdministrator(identity))
+            if (!IsAdministrator)
                 return Forbid();
 
             var success = _manager.RemoveGroup(groupId);
@@ -118,9 +120,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [HttpPut("{groupId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
-        public IActionResult Update([FromQuery]string identity, int groupId, [FromBody]FeatureGroupViewModel groupVM)
+        public IActionResult Update(int groupId, [FromBody]FeatureGroupViewModel groupVM)
         {
-            if (!IsAdministrator(identity))
+            if (!IsAdministrator)
                 return Forbid();
 
             // TODO: What is the purpose of this operation?
@@ -135,9 +137,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
-        public IActionResult AssignMember([FromQuery]string identity, string userId, int groupId)
+        public IActionResult AssignMember(string userId, int groupId)
         {
-            if (!IsAdministrator(identity))
+            if (!IsAdministrator)
                 return Forbid();
 
             var user = _manager.GetOrCreateUser(userId);
@@ -148,11 +150,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 
             _manager.MoveUserToGroup(user, group);
             return Ok();
-        }
-
-        private bool IsAdministrator(string identity)
-        {
-            return _cmsService.GetUserRole(identity ?? User.Identity.GetUserIdentity()) == "Administrator";
         }
     }
 }
