@@ -139,6 +139,56 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             return true;
         }
 
+        /// <summary>
+        /// Updates a feature group by replacing the enabled features and group members with new collections.
+        /// Members that are effectively removed from the group are assigned to the default group.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="newFeatures"></param>
+        /// <param name="newMembers"></param>
+        /// <exception cref="ArgumentException">The new group name is already in use or there is no group with the specified ID</exception>
+        /// <exception cref="InvalidOperationException">It is attempted to rename a protected feature group</exception>
+        public void UpdateGroup(int groupId, string newName, IEnumerable<Feature> newFeatures, IEnumerable<User> newMembers)
+        {
+            if (_db.FeatureGroups.Any(g => g.Name == newName && g.Id != groupId))
+                throw new ArgumentException($"A feature group with name '{newName}' already exists");
+
+            var group = GetGroup(groupId, loadMembers: true, loadFeatures: true);
+
+            if (group == null)
+                throw new ArgumentException($"There is no feature group with ID '{groupId}'");
+
+            if (group.IsProtected && newName != group.Name)
+                throw new InvalidOperationException($"Protected group '{group.Name}' cannot be renamed");
+
+            group.Name = newName;
+
+            // remove old members
+            foreach (var user in group.Members.ToList())
+                MoveUserToGroupCore(user, DefaultGroup);
+
+            // add new members
+            foreach (var user in newMembers)
+                MoveUserToGroupCore(user, group);
+
+            // remove old enabled features
+            foreach (var mapping in group.EnabledFeatures.ToList())
+            {
+                mapping.Feature.GroupsWhereEnabled.Remove(mapping);
+                group.EnabledFeatures.Remove(mapping);
+            }
+
+            // add new enabled features
+            foreach (var feature in newFeatures)
+            {
+                var mapping = new FeatureToFeatureGroupMapping(feature, group);
+                feature.GroupsWhereEnabled.Add(mapping);
+                group.EnabledFeatures.Add(mapping);
+            }
+
+            _db.SaveChanges();
+        }
+
         /// <exception cref="ArgumentNullException">Any argument is null</exception>
         public void MoveUserToGroup(User user, FeatureGroup group)
         {

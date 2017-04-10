@@ -13,7 +13,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Entity
         public string Name { get; set; }
 
         /// <summary>
-        /// If true, the group can't be deleted.
+        /// If true, the group can't be deleted or renamed.
         /// </summary>
         public bool IsProtected { get; set; }
 

@@ -127,8 +127,24 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             if (!IsAdministrator)
                 return Forbid();
 
-            // TODO: What is the purpose of this operation?
-            return BadRequest();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var features = _manager.GetFeatures(groupVM.EnabledFeatures);
+                var members = _manager.GetOrCreateUsers(groupVM.Members);
+                _manager.UpdateGroup(groupId, groupVM.Name, features, members);
+                return Ok();
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         /// <summary>
