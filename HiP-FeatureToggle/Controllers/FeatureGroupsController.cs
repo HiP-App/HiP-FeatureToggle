@@ -6,6 +6,7 @@ using PaderbornUniversity.SILab.Hip.FeatureToggle.Models.FeatureGroups;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Services;
 using PaderbornUniversity.SILab.Hip.Webservice;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
@@ -14,7 +15,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
     /// Provides methods to add/remove feature groups and to assign users to these groups.
     /// </summary>
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("Api/[controller]")]
     public class FeatureGroupsController : Controller
     {
         private readonly FeatureGroupsManager _manager;
@@ -26,7 +27,12 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             _cmsService = cmsService;
         }
 
+        /// <summary>
+        /// Gets all feature groups.
+        /// </summary>
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<FeatureGroupResult>), 200)]
+        [ProducesResponseType(403)]
         public IActionResult GetAll([FromQuery]string identity)
         {
             if (!IsAdministrator(identity))
@@ -37,7 +43,12 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// Gets a specific feature group by ID.
+        /// </summary>
         [HttpGet("{groupId}")]
+        [ProducesResponseType(typeof(FeatureGroupResult), 200)]
+        [ProducesResponseType(403)]
         public IActionResult GetById([FromQuery]string identity, int groupId)
         {
             if (!IsAdministrator(identity))
@@ -51,7 +62,14 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             return Ok(new FeatureGroupResult(group));
         }
 
+        /// <summary>
+        /// Stores a new feature group.
+        /// </summary>
+        /// <param name="groupVM">Creation arguments</param>
         [HttpPost]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(403)]
         public IActionResult Create([FromQuery]string identity, [FromBody]FeatureGroupViewModel groupVM)
         {
             if (!IsAdministrator(identity))
@@ -77,7 +95,13 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a feature group. Members are moved to the default group.
+        /// </summary>
         [HttpDelete("{groupId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(403)]
+        [ProducesResponseType(404)]
         public IActionResult Delete([FromQuery]string identity, int groupId)
         {
             if (!IsAdministrator(identity))
@@ -92,6 +116,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         }
 
         [HttpPut("{groupId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(403)]
         public IActionResult Update([FromQuery]string identity, int groupId, [FromBody]FeatureGroupViewModel groupVM)
         {
             if (!IsAdministrator(identity))
@@ -101,7 +127,14 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             return BadRequest();
         }
 
-        [HttpPut("/api/Users/{userId}/FeatureGroup/{groupId}")]
+        /// <summary>
+        /// Removes a user from its current feature group and assigns it to a new feature group.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("/Api/Users/{userId}/FeatureGroup/{groupId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(403)]
+        [ProducesResponseType(404)]
         public IActionResult AssignMember([FromQuery]string identity, string userId, int groupId)
         {
             if (!IsAdministrator(identity))
