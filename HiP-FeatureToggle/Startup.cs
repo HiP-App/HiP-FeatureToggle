@@ -5,15 +5,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.PlatformAbstractions;
 using System;
-using System.IO;
-using System.Text;
 using Swashbuckle.AspNetCore.Swagger;
 
 using PaderbornUniversity.SILab.Hip.Webservice;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
+using PaderbornUniversity.SILab.Hip.FeatureToggle.Clients;
+using PaderbornUniversity.SILab.Hip.FeatureToggle.Services;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 {
@@ -42,6 +41,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             // Inject a configuration with the properties from AppConfig that
             // match the given Configuration (which was loaded in the constructor).
             services.Configure<AppConfig>(Configuration);
+            services.Configure<HiPCMSAPIConfig>(Configuration);
 
             // Add Cross Orign Requests 
             services.AddCors();
@@ -63,6 +63,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 
             // Add managers
             services.AddTransient<FeatureGroupsManager>();
+            services.AddTransient<CmsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

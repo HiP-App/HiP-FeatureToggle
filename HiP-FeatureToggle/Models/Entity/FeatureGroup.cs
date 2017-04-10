@@ -23,5 +23,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Entity
         /// The opposite direction of this many-to-many relation is <see cref="Feature.GroupsWhereEnabled"/>.
         /// </summary>
         public IList<FeatureToFeatureGroupMapping> EnabledFeatures { get; set; }
+
+        public override string ToString() =>
+            $"'{Name}' ({Members?.Count ?? 0} members, {EnabledFeatures?.Count ?? 0} features)";
     }
 }
