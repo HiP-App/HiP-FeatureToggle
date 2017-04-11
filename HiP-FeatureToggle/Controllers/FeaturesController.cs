@@ -72,6 +72,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
         [ProducesResponseType(409)]
+        [ProducesResponseType(422)]
         public IActionResult Create([FromBody]FeatureArgs args)
         {
             if (!IsAdministrator)
@@ -91,7 +92,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             }
             catch (ArgumentException e)
             {
-                return StatusCode(409, e.Message);
+                return StatusCode(409, e.Message); // feature name already in use
             }
         }
 
