@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.FeatureGroups
+namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Rest
 {
     public class FeatureGroupResult
     {

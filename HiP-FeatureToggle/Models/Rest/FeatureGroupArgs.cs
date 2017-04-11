@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.FeatureGroups
+namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Rest
 {
-    public class FeatureGroupViewModel
+    public class FeatureGroupArgs
     {
         [Required]
         public string Name { get; set; }
