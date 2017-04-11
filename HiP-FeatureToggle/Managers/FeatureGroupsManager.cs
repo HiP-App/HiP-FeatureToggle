@@ -77,13 +77,17 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
         }
 
         /// <exception cref="ResourceNotFoundException{Feature}">No features exist for one or multiple of the specified IDs</exception>
-        public IReadOnlyCollection<Feature> GetFeatures(IEnumerable<int> featureIds)
+        public IReadOnlyCollection<Feature> GetFeatures(IEnumerable<int> featureIds, bool loadGroups = false)
         {
             if (featureIds == null)
                 return _noFeatures;
 
             var featureIdsSet = featureIds.ToSet();
-            var storedFeatures = _db.Features.Where(f => featureIdsSet.Contains(f.Id)).ToList();
+
+            var storedFeatures = _db.Features
+                .IncludeIf(loadGroups, nameof(Feature.GroupsWhereEnabled))
+                .Where(f => featureIdsSet.Contains(f.Id)).ToList();
+
             var missingFeatureIds = featureIdsSet.Except(storedFeatures.Select(f => f.Id));
 
             if (missingFeatureIds.Any())
@@ -183,7 +187,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
             group.Name = args.Name;
             var newMembers = GetOrCreateUsers(args.Members).ToList();
-            var newFeatures = GetFeatures(args.EnabledFeatures);
+            var newFeatures = GetFeatures(args.EnabledFeatures, loadGroups: true);
 
             // remove old members
             foreach (var user in group.Members.ToList())
@@ -194,14 +198,15 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
                 MoveUserToGroupCore(user, group);
 
             // remove old enabled features
-            foreach (var mapping in group.EnabledFeatures.ToList())
-            {
-                mapping.Feature.GroupsWhereEnabled.Remove(mapping);
-                group.EnabledFeatures.Remove(mapping);
-            }
+            // (for EF to work, we have to make sure not to delete & re-add the same mapping)
+            var featuresToRemove = group.EnabledFeatures.Where(m => !newFeatures.Any(f => f.Id == m.FeatureId)).ToList();
+            var featuresToAdd = newFeatures.Where(f => !group.EnabledFeatures.Any(m => m.FeatureId == f.Id)).ToList();
+
+            foreach (var mapping in featuresToRemove)
+                _db.FeatureToFeatureGroupMappings.Remove(mapping);
 
             // add new enabled features
-            foreach (var feature in newFeatures)
+            foreach (var feature in featuresToAdd)
             {
                 var mapping = new FeatureToFeatureGroupMapping(feature, group);
                 feature.GroupsWhereEnabled.Add(mapping);

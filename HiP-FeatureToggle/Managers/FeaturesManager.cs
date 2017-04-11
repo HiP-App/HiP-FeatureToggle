@@ -85,7 +85,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
             // 1) remove feature from groups where it is enabled
             foreach (var mapping in feature.GroupsWhereEnabled.ToList())
-                mapping.Group.EnabledFeatures.Remove(mapping);
+                _db.FeatureToFeatureGroupMappings.Remove(mapping);
 
             // 2) detach from parent feature
             feature.Parent?.Children.Remove(feature);
@@ -154,7 +154,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             if (feature == other)
                 return true;
 
-            // Note: Load() doesn't work here, probably because the entity is tracked
+            // next parent must be explicitly loaded since usually not the whole tree structure is available here
+            // (Note: Load() doesn't work here, probably because the entity is tracked)
             var next = _db.Entry(feature).Reference(f => f.Parent).Query().FirstOrDefault();
             return IsDescendantOrEqual(next, other);
         }

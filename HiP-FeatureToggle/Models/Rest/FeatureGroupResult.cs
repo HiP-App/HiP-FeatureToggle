@@ -18,7 +18,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Rest
         {
             Id = group.Id;
             Name = group.Name;
-            EnabledFeatures = group.EnabledFeatures.Select(f => f.Feature.Id).ToList();
+            EnabledFeatures = group.EnabledFeatures.Select(f => f.FeatureId).ToList();
             Members = group.Members.Select(m => m.Id).ToList();
         }
     }

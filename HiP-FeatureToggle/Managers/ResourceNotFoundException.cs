@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,12 +27,12 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
         /// <param name="key">The key or a collection of keys corresponding to the missing resource(s)</param>
         public ResourceNotFoundException(object key, Type resourceType) : base(BuildMessage(key, resourceType))
         {
-            Keys = (key as IEnumerable<object>)?.ToArray() ?? new[] { key };
+            Keys = (key as IEnumerable)?.Cast<object>().ToArray() ?? new[] { key };
         }
 
         private static string BuildMessage(object key, Type resourceType)
         {
-            var keys = (key as IEnumerable<object>)?.ToArray() ?? new[] { key };
+            var keys = (key as IEnumerable)?.Cast<object>().ToArray() ?? new[] { key };
             var suffix = $"of type '{resourceType.Name}' cannot be found";
 
             switch (keys?.Count() ?? 0)

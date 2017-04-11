@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PaderbornUniversity.SILab.Hip.FeatureToggle.Models;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Entity;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Data
@@ -17,6 +16,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Data
         public DbSet<Feature> Features { get; set; }
 
         public DbSet<FeatureGroup> FeatureGroups { get; set; }
+
+        public DbSet<FeatureToFeatureGroupMapping> FeatureToFeatureGroupMappings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
