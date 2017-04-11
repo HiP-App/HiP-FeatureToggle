@@ -125,6 +125,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Updates a feature group.
+        /// </summary>
         [HttpPut("{groupId}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]

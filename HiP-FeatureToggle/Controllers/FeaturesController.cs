@@ -8,7 +8,6 @@ using PaderbornUniversity.SILab.Hip.Webservice;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 {
@@ -46,6 +45,28 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// Gets a specific feature by ID.
+        /// </summary>
+        [HttpGet("{featureId}")]
+        [ProducesResponseType(typeof(FeatureResult), 200)]
+        [ProducesResponseType(403)]
+        public IActionResult GetById(int featureId)
+        {
+            if (!IsAdministrator)
+                return Forbid();
+
+            var feature = _manager.GetFeature(featureId, loadChildren: true, loadGroups: true);
+
+            if (feature == null)
+                return NotFound();
+
+            return Ok(new FeatureResult(feature));
+        }
+
+        /// <summary>
+        /// Stores a new feature.
+        /// </summary>
         [HttpPost]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
@@ -75,8 +96,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         }
 
         /// <summary>
-        /// Deletes a feature.
-        /// TODO: What happens to descendants? 1) delete whole subtree, 2) move to parent
+        /// Deletes a feature. If the feature has children, these are made children of the deleted feature's parent.
         /// </summary>
         /// <param name="featureId"></param>
         /// <returns></returns>
@@ -100,6 +120,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates a feature. If the reference to the parent is modified, this moves the whole subtree of features.
+        /// </summary>
         [HttpPut("{featureId}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(403)]

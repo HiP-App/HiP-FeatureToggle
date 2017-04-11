@@ -2,9 +2,7 @@
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Entity;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Rest;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 {
@@ -102,7 +100,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
         }
 
         /// <summary>
-        /// Updates a feature. If the parent feature is modified, this moves the whole subtree of features.
+        /// Updates a feature. If the reference to the parent is modified, this moves the whole subtree of features.
         /// </summary>
         /// <exception cref="ArgumentNullException">The specified arguments are null</exception>
         /// <exception cref="ArgumentException">The new feature name is already in use</exception>
