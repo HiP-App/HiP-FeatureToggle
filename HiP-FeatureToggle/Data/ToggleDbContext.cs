@@ -28,6 +28,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Data
              */
             modelBuilder.Entity<FeatureToFeatureGroupMapping>().Configure();
             modelBuilder.Entity<FeatureGroup>().Configure();
+            modelBuilder.Entity<Feature>().Configure();
         }
     }
 }
