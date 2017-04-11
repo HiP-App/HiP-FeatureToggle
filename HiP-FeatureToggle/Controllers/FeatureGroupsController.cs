@@ -86,7 +86,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
                 _manager.CreateGroup(groupArgs);
                 return Ok();
             }
-            catch (ResourceNotFoundException e)
+            catch (ResourceNotFoundException<Feature> e)
             {
                 return StatusCode(422, e.Message); // invalid feature ID
             }
@@ -113,7 +113,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             {
                 _manager.RemoveGroup(groupId);
             }
-            catch (ResourceNotFoundException e)
+            catch (ResourceNotFoundException<FeatureGroup> e)
             {
                 return NotFound(e.Message); // group does not exist
             }
@@ -143,11 +143,11 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
                 _manager.UpdateGroup(groupId, groupArgs);
                 return Ok();
             }
-            catch (ResourceNotFoundException e) when (e.ResourceType == typeof(FeatureGroup))
+            catch (ResourceNotFoundException<FeatureGroup> e)
             {
                 return NotFound(e.Message); // invalid group ID
             }
-            catch (ResourceNotFoundException e)
+            catch (ResourceNotFoundException<Feature> e)
             {
                 return StatusCode(422, e.Message); // invalid feature ID
             }
@@ -178,7 +178,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             {
                 _manager.MoveUserToGroup(userId, groupId);
             }
-            catch (ResourceNotFoundException e)
+            catch (ResourceNotFoundException<FeatureGroup> e)
             {
                 return NotFound(e.Message);
             }

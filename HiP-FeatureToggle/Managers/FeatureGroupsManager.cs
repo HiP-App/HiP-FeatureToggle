@@ -76,7 +76,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             return storedUsers;
         }
 
-        /// <exception cref="ResourceNotFoundException">No features exist for one or multiple of the specified IDs</exception>
+        /// <exception cref="ResourceNotFoundException{Feature}">No features exist for one or multiple of the specified IDs</exception>
         public IReadOnlyCollection<Feature> GetFeatures(IEnumerable<int> featureIds)
         {
             if (featureIds == null)
@@ -87,7 +87,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             var missingFeatureIds = featureIdsSet.Except(storedFeatures.Select(f => f.Id));
 
             if (missingFeatureIds.Any())
-                throw new ResourceNotFoundException(missingFeatureIds, typeof(Feature));
+                throw new ResourceNotFoundException<Feature>(missingFeatureIds);
 
             return storedFeatures;
         }
@@ -107,7 +107,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
         /// <exception cref="ArgumentNullException">Specified argument is null</exception>
         /// <exception cref="ArgumentException">A feature group with the specified name already exists</exception>
-        /// <exception cref="ResourceNotFoundException">A referenced feature does not exist</exception>
+        /// <exception cref="ResourceNotFoundException{Feature}">A referenced feature does not exist</exception>
         public void CreateGroup(FeatureGroupArgs args)
         {
             if (args == null)
@@ -132,15 +132,15 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             _db.FeatureGroups.Add(group);
             _db.SaveChanges();
         }
-        
-        /// <exception cref="ResourceNotFoundException">Group with specified ID not found</exception>
+
+        /// <exception cref="ResourceNotFoundException{FeatureGroup}">Group with specified ID not found</exception>
         /// <exception cref="InvalidOperationException">Attempted to remove protected group</exception>
         public void RemoveGroup(int groupId)
         {
             var group = GetGroup(groupId, loadMembers: true);
 
             if (group == null)
-                throw new ResourceNotFoundException(groupId, typeof(FeatureGroup));
+                throw new ResourceNotFoundException<FeatureGroup>(groupId);
 
             if (group.IsProtected)
                 throw new InvalidOperationException($"Protected group '{groupId}' cannot be removed");
@@ -162,17 +162,21 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
         /// <param name="newMembers"></param>
         /// <exception cref="ArgumentNullException">Arguments are null</exception>
         /// <exception cref="ArgumentException">The new group name is already in use</exception>
-        /// <exception cref="ResourceNotFoundException">There is no group or feature with the specified ID</exception>
+        /// <exception cref="ResourceNotFoundException{Feature}">There is no feature with the specified ID</exception>
+        /// <exception cref="ResourceNotFoundException{FeatureGroup}">There is no group with the specified ID</exception>
         /// <exception cref="InvalidOperationException">It is attempted to rename a protected feature group</exception>
         public void UpdateGroup(int groupId, FeatureGroupArgs args)
         {
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+
             if (_db.FeatureGroups.Any(g => g.Name == args.Name && g.Id != groupId))
                 throw new ArgumentException($"A feature group with name '{args.Name}' already exists");
 
             var group = GetGroup(groupId, loadMembers: true, loadFeatures: true);
 
             if (group == null)
-                throw new ResourceNotFoundException(groupId, typeof(FeatureGroup));
+                throw new ResourceNotFoundException<FeatureGroup>(groupId);
 
             if (group.IsProtected && args.Name != group.Name)
                 throw new InvalidOperationException($"Protected group '{group.Name}' cannot be renamed");
@@ -206,15 +210,15 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
             _db.SaveChanges();
         }
-        
-        /// <exception cref="ResourceNotFoundException">The group with specified ID does not exist</exception>
+
+        /// <exception cref="ResourceNotFoundException{FeatureGroup}">The group with specified ID does not exist</exception>
         public void MoveUserToGroup(string userId, int groupId)
         {
             var user = GetOrCreateUser(userId);
             var group = GetGroup(groupId, loadMembers: true);
 
             if (group == null)
-                throw new ResourceNotFoundException(groupId, typeof(FeatureGroup));
+                throw new ResourceNotFoundException<FeatureGroup>(groupId);
 
             MoveUserToGroupCore(user, group);
             _db.SaveChanges();

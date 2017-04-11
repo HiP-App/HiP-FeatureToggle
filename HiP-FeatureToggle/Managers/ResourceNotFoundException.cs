@@ -4,31 +4,41 @@ using System.Linq;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 {
-    public class ResourceNotFoundException : Exception
+    /// <summary>
+    /// Indicates that one or more resources referenced by keys/IDs do not exist.
+    /// </summary>
+    /// <typeparam name="T">Resource type</typeparam>
+    public class ResourceNotFoundException<T> : ResourceNotFoundException
+    {
+        public override Type ResourceType => typeof(T);
+
+        public ResourceNotFoundException(object key) : base(key, typeof(T))
+        {
+        }
+    }
+
+    public abstract class ResourceNotFoundException : Exception
     {
         public IReadOnlyCollection<object> Keys { get; }
 
-        public Type ResourceType { get; }
+        public abstract Type ResourceType { get; }
 
         /// <param name="key">The key or a collection of keys corresponding to the missing resource(s)</param>
-        /// <param name="resourceType">The type of the missing resource(s)</param>
-        public ResourceNotFoundException(object key, Type resourceType = null)
-            : base(BuildMessage(key, resourceType))
+        public ResourceNotFoundException(object key, Type resourceType) : base(BuildMessage(key, resourceType))
         {
             Keys = (key as IEnumerable<object>)?.ToArray() ?? new[] { key };
-            ResourceType = resourceType;
         }
 
         private static string BuildMessage(object key, Type resourceType)
         {
-            var typeString = (resourceType == null) ? "" : $"of type '{resourceType.Name}' ";
             var keys = (key as IEnumerable<object>)?.ToArray() ?? new[] { key };
+            var suffix = $"of type '{resourceType.Name}' cannot be found";
 
             switch (keys?.Count() ?? 0)
             {
-                case 0: return $"A resource {typeString}cannot be found";
-                case 1: return $"The resource '{keys.First()}' {typeString}cannot be found";
-                default: return $"The resources [{string.Join(", ", keys)}] {typeString}cannot be found";
+                case 0: return $"A resource {suffix}";
+                case 1: return $"The resource '{keys.First()}' {suffix}";
+                default: return $"The resources [{string.Join(", ", keys)}] {suffix}";
             }
         }
     }
