@@ -100,7 +100,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// </summary>
         /// <param name="featureId"></param>
         /// <returns></returns>
-        [HttpDelete]
+        [HttpDelete("{featureId}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
