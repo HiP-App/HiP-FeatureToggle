@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,24 +10,19 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
         public Type ResourceType { get; }
 
-        /// <param name="keys">The keys corresponding to the missing resources</param>
-        /// <param name="resourceType">The type of the missing resources</param>
-        public ResourceNotFoundException(IEnumerable<object> keys, Type resourceType = null)
-            : base(BuildMessage(keys, resourceType))
+        /// <param name="key">The key or a collection of keys corresponding to the missing resource(s)</param>
+        /// <param name="resourceType">The type of the missing resource(s)</param>
+        public ResourceNotFoundException(object key, Type resourceType = null)
+            : base(BuildMessage(key, resourceType))
         {
-            Keys = keys.ToList();
+            Keys = (key as IEnumerable<object>)?.ToArray() ?? new[] { key };
             ResourceType = resourceType;
         }
 
-        /// <param name="key">The key corresponding to the missing resource</param>
-        /// <param name="resourceType">The type of the missing resource</param>
-        public ResourceNotFoundException(object key, Type resourceType = null) : this(new[] { key }, resourceType)
-        {
-        }
-
-        private static string BuildMessage(IEnumerable<object> keys, Type resourceType)
+        private static string BuildMessage(object key, Type resourceType)
         {
             var typeString = (resourceType == null) ? "" : $"of type '{resourceType.Name}' ";
+            var keys = (key as IEnumerable<object>)?.ToArray() ?? new[] { key };
 
             switch (keys?.Count() ?? 0)
             {
