@@ -10,9 +10,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Rest
 
         public string Name { get; }
 
-        public IReadOnlyList<string> Members { get; }
+        public IReadOnlyCollection<string> Members { get; }
 
-        public IReadOnlyList<int> EnabledFeatures { get; }
+        public IReadOnlyCollection<int> EnabledFeatures { get; }
 
         public FeatureGroupResult(FeatureGroup group)
         {

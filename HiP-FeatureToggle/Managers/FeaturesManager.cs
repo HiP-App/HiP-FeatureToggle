@@ -44,9 +44,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
             var feature = new Feature { Name = args.Name };
 
-            if (args.Parent != -1)
+            if (args.Parent != null)
             {
-                feature.Parent = GetFeature(args.Parent);
+                feature.Parent = GetFeature(args.Parent.Value);
 
                 if (feature.Parent == null)
                     throw new ResourceNotFoundException<Feature>(args.Parent);

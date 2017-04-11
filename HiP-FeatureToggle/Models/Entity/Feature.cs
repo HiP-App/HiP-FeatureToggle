@@ -11,7 +11,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Entity
 
         public Feature Parent { get; set; }
 
-        public int ParentId { get; set; }
+        public int? ParentId { get; set; }
 
         public List<Feature> Children { get; set; }
 

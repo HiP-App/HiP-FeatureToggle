@@ -64,6 +64,10 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
                 _manager.CreateFeature(args);
                 return Ok();
             }
+            catch (ResourceNotFoundException<Feature> e)
+            {
+                return StatusCode(422, e.Message); // invalid parent feature ID
+            }
             catch (ArgumentException e)
             {
                 return StatusCode(409, e.Message);

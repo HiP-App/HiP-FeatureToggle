@@ -10,15 +10,18 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Rest
 
         public string Name { get; }
 
-        public int Parent { get; }
+        public int? Parent { get; }
 
-        public IReadOnlyList<int> GroupsWhereEnabled { get; }
+        public IReadOnlyCollection<int> Children { get; }
+
+        public IReadOnlyCollection<int> GroupsWhereEnabled { get; }
 
         public FeatureResult(Feature feature)
         {
             Id = feature.Id;
             Name = feature.Name;
             Parent = feature.ParentId;
+            Children = feature.Children?.Select(f => f.Id).ToList();
             GroupsWhereEnabled = feature.GroupsWhereEnabled?.Select(g => g.GroupId).ToList();
         }
     }
