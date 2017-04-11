@@ -41,7 +41,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             if (!IsAdministrator)
                 return Forbid();
 
-            var features = _manager.GetFeatures(loadGroups: true);
+            var features = _manager.GetFeatures(loadChildren: true, loadGroups: true);
             var results = features.ToList().Select(f => new FeatureResult(f));
             return Ok(results);
         }
@@ -111,6 +111,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             if (!IsAdministrator)
                 return Forbid();
 
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 _manager.UpdateFeature(featureId, args);
@@ -127,6 +130,10 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             catch (ResourceNotFoundException<Feature> e)
             {
                 return StatusCode(422, e.Message); // referenced parent feature does not exist
+            }
+            catch (InvalidOperationException e)
+            {
+                return StatusCode(409, e.Message); // invalid parent modification
             }
         }
     }
