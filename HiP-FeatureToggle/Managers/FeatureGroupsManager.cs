@@ -94,7 +94,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             if (group.IsProtected && args.Name != group.Name)
                 throw new InvalidOperationException($"Protected group '{group.Name}' cannot be renamed");
 
-            if (group.Id == PublicGroup.Id && args.Members.Count > 0)
+            if (group.Id == PublicGroup.Id && (args.Members?.Count ?? 0) > 0)
                 throw new InvalidOperationException("Users cannot explicitly be moved into the public group");
 
             group.Name = args.Name;
