@@ -166,7 +166,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             var user = GetOrCreateUser(userId);
 
             return _db.FeatureGroups
-                .Include(g => g.EnabledFeatures).ThenInclude(m => m.Feature)
+                .Include(g => g.EnabledFeatures).ThenInclude(m => m.Feature).ThenInclude(f => f.Children)
                 .First(g => g.Id == user.FeatureGroupId); // per specification, this group must exist
         }
 

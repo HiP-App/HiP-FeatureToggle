@@ -30,11 +30,15 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             // Load standard groups which are always available and can't be deleted.
             // If this fails, the database is not correctly initialized.
             DefaultGroup = GetAllGroups(true, true)
-                .Include(g => g.EnabledFeatures).ThenInclude(m => m.Feature)
+                .Include(g => g.EnabledFeatures)
+                    .ThenInclude(m => m.Feature) // loading this is required for checking effectively enabled features
+                        .ThenInclude(f => f.Children)
                 .Single(g => g.Name == FeatureGroup.DefaultGroupName);
 
             PublicGroup = GetAllGroups(true, true)
-                .Include(g => g.EnabledFeatures).ThenInclude(m => m.Feature) // loading this is required for checking effectively enabled features
+                .Include(g => g.EnabledFeatures)
+                    .ThenInclude(m => m.Feature) // loading this is required for checking effectively enabled features
+                        .ThenInclude(f => f.Children)
                 .Single(g => g.Name == FeatureGroup.PublicGroupName);
         }
 
