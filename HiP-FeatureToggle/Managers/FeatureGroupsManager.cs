@@ -77,7 +77,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
         /// <exception cref="ArgumentException">The new group name is already in use</exception>
         /// <exception cref="ResourceNotFoundException{Feature}">There is no feature with the specified ID</exception>
         /// <exception cref="ResourceNotFoundException{FeatureGroup}">There is no group with the specified ID</exception>
-        /// <exception cref="InvalidOperationException">It is attempted to rename a protected feature group</exception>
+        /// <exception cref="InvalidOperationException">Tried to rename a protected feature group or tried to move users to the public group</exception>
         public void UpdateGroup(int groupId, FeatureGroupArgs args)
         {
             if (args == null)
@@ -93,6 +93,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
             if (group.IsProtected && args.Name != group.Name)
                 throw new InvalidOperationException($"Protected group '{group.Name}' cannot be renamed");
+
+            if (group.Id == PublicGroup.Id && args.Members.Count > 0)
+                throw new InvalidOperationException("Users cannot explicitly be moved into the public group");
 
             group.Name = args.Name;
             var newMembers = GetOrCreateUsers(args.Members).ToList();
@@ -126,8 +129,12 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
         }
 
         /// <exception cref="ResourceNotFoundException{FeatureGroup}">The group with specified ID does not exist</exception>
+        /// <exception cref="InvalidOperationException">Tried to move user to the public group</exception>
         public void MoveUserToGroup(string userId, int groupId)
         {
+            if (groupId == PublicGroup.Id)
+                throw new InvalidOperationException("Users cannot explicitly be moved into the public group");
+
             var user = GetOrCreateUser(userId);
             var group = GetGroup(groupId, loadMembers: true);
 
