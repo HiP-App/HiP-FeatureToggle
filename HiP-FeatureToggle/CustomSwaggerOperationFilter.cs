@@ -38,7 +38,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
                 Type = "string"
             });
 
-            operation.Responses.Add("401", new Response { Description = "Unauthorized" });
+            if (!allowAnonymous)
+                operation.Responses.Add("401", new Response { Description = "Unauthorized" });
         }
 
     }
