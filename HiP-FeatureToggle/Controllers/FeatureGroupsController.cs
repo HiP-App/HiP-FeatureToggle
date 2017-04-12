@@ -40,7 +40,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             if (!IsAdministrator)
                 return Forbid();
 
-            var groups = _manager.GetGroups(loadMembers: true, loadFeatures: true);
+            var groups = _manager.GetAllGroups(loadMembers: true, loadFeatures: true);
             var results = groups.ToList().Select(g => new FeatureGroupResult(g)); // note: ToList() is required here
             return Ok(results);
         }
