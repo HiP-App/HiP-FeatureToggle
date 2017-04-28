@@ -65,9 +65,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             if (feature == null)
                 throw new ResourceNotFoundException<Feature>(featureId);
 
-            var mappings = feature.GroupsWhereEnabled.ToList();
-            var groups = feature.GroupsWhereEnabled.Select(m => m.Group).ToList();
-
             // 1) remove feature from groups where it is enabled
             foreach (var mapping in feature.GroupsWhereEnabled.ToList())
                 _db.FeatureToFeatureGroupMappings.Remove(mapping);

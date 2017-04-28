@@ -17,8 +17,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 {
     public class Startup
     {
-        private const string _Version = "v1";
-        private const string _Name = "HiP Feature Toggle API";
+        private const string Version = "v1";
+        private const string Name = "HiP Feature Toggle API";
 
         public Startup(IHostingEnvironment env)
         {
@@ -52,7 +52,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             services.AddSwaggerGen(c =>
             {
                 // Define a Swagger document
-                c.SwaggerDoc("v1", new Info() { Title = _Name, Version = _Version });
+                c.SwaggerDoc("v1", new Info() { Title = Name, Version = Version });
                 c.OperationFilter<CustomSwaggerOperationFilter>();
             });
 
@@ -113,7 +113,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             {
                 // TODO: Only a hack, if HiP-Swagger is running, SwaggerUI can be disabled for Production
                 c.SwaggerEndpoint((env.IsDevelopment() ? "/swagger" : "..") +
-                                  "/" + _Version + "/swagger.json", _Name + _Version);
+                                  "/" + Version + "/swagger.json", Name + Version);
             });
 
             // Run migrations
