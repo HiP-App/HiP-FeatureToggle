@@ -11,7 +11,6 @@ using Swashbuckle.AspNetCore.Swagger;
 using PaderbornUniversity.SILab.Hip.Webservice;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
-using PaderbornUniversity.SILab.Hip.FeatureToggle.Clients;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Services;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle
@@ -41,7 +40,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             // Inject a configuration with the properties from AppConfig that
             // match the given Configuration (which was loaded in the constructor).
             services.Configure<AppConfig>(Configuration);
-            services.Configure<HiPCMSAPIConfig>(Configuration);
 
             // Add Cross Orign Requests 
             services.AddCors();
