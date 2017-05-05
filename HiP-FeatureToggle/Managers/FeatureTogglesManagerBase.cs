@@ -8,8 +8,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 {
     public abstract class FeatureTogglesManagerBase
     {
-        private static readonly User[] _noUsers = new User[0];
-        private static readonly Feature[] _noFeatures = new Feature[0];
+        private static readonly User[] NoUsers = new User[0];
+        private static readonly Feature[] NoFeatures = new Feature[0];
 
         protected readonly ToggleDbContext _db;
 
@@ -60,7 +60,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
         protected IEnumerable<User> GetOrCreateUsers(IEnumerable<string> userIds)
         {
             if (userIds == null)
-                return _noUsers;
+                return NoUsers;
 
             var userIdsSet = userIds.ToSet();
             var storedUsers = _db.Users.Where(u => userIdsSet.Contains(u.Id)).ToList();
@@ -69,7 +69,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             if (missingUserIds.Any())
             {
                 // Create missing users
-                var newUsers = missingUserIds.Select(id => CreateUser(id)).ToList();
+                var newUsers = missingUserIds.Select(CreateUser).ToList();
                 _db.SaveChanges();
                 return storedUsers.Concat(newUsers);
             }
@@ -94,7 +94,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
         protected IReadOnlyCollection<Feature> GetFeatures(IEnumerable<int> featureIds, bool loadGroups = false)
         {
             if (featureIds == null)
-                return _noFeatures;
+                return NoFeatures;
 
             var featureIdsSet = featureIds.ToSet();
 
