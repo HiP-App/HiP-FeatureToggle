@@ -25,6 +25,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
         public abstract Type ResourceType { get; }
 
         /// <param name="key">The key or a collection of keys corresponding to the missing resource(s)</param>
+        /// <param name="resourceType">The type of the missing resource(s)</param>
         public ResourceNotFoundException(object key, Type resourceType) : base(BuildMessage(key, resourceType))
         {
             Keys = (key as IEnumerable)?.Cast<object>().ToArray() ?? new[] { key };
@@ -35,7 +36,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             var keys = (key as IEnumerable)?.Cast<object>().ToArray() ?? new[] { key };
             var suffix = $"of type '{resourceType.Name}' cannot be found";
 
-            switch (keys?.Count() ?? 0)
+            switch (keys.Length)
             {
                 case 0: return $"A resource {suffix}";
                 case 1: return $"The resource '{keys.First()}' {suffix}";
