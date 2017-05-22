@@ -70,9 +70,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
         /// Updates a feature group by replacing the enabled features and group members with new collections.
         /// Members that are effectively removed from the group are assigned to the default group.
         /// </summary>
-        /// <param name="groupId"></param>
-        /// <param name="newFeatures"></param>
-        /// <param name="newMembers"></param>
         /// <exception cref="ArgumentNullException">Arguments are null</exception>
         /// <exception cref="ArgumentException">The new group name is already in use</exception>
         /// <exception cref="ResourceNotFoundException{Feature}">There is no feature with the specified ID</exception>

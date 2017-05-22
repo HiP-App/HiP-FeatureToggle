@@ -65,9 +65,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             if (feature == null)
                 throw new ResourceNotFoundException<Feature>(featureId);
 
-            var mappings = feature.GroupsWhereEnabled.ToList();
-            var groups = feature.GroupsWhereEnabled.Select(m => m.Group).ToList();
-
             // 1) remove feature from groups where it is enabled
             foreach (var mapping in feature.GroupsWhereEnabled.ToList())
                 _db.FeatureToFeatureGroupMappings.Remove(mapping);
@@ -112,7 +109,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             // ensure that the new parent is not a descendant of or equal to the feature to be updated
             // (this would create a cycle destroying the tree structure)
             if (IsDescendantOrEqual(newParent, feature))
-                throw new InvalidOperationException($"Changing the parent of '{featureId}' to '{args.Parent.Value}' would destroy the tree structure because '{args.Parent.Value}' is a descendant of or the same as '{featureId}'");
+                if (args.Parent != null)
+                    throw new InvalidOperationException($"Changing the parent of '{featureId}' to '{args.Parent.Value}' would destroy the tree structure because '{args.Parent.Value}' is a descendant of or the same as '{featureId}'");
 
             // 1) update name
             feature.Name = args.Name;
