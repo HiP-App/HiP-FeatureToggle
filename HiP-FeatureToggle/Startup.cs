@@ -89,15 +89,16 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             );
 
             // Configure JWT-based authentication using the configuration values from appsettings*.json
-            app.UseJwtBearerAuthentication(new JwtBearerOptions
-            {
-                Audience = config.CLIENT_ID,
-                Authority = config.DOMAIN,
-                AutomaticChallenge = true,
-                AutomaticAuthenticate = true,
-                RequireHttpsMetadata = !Convert.ToBoolean(config.ALLOW_HTTP),
-                Events = new BearerEvents()
-            });
+            // TODO: Uncomment to re-enable authentication
+            //app.UseJwtBearerAuthentication(new JwtBearerOptions
+            //{
+            //    Audience = config.CLIENT_ID,
+            //    Authority = config.DOMAIN,
+            //    AutomaticChallenge = true,
+            //    AutomaticAuthenticate = true,
+            //    RequireHttpsMetadata = !Convert.ToBoolean(config.ALLOW_HTTP),
+            //    Events = new BearerEvents()
+            //});
 
             app.UseMvc();
 
