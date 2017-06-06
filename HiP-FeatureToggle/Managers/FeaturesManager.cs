@@ -22,7 +22,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             if (args == null)
                 throw new ArgumentNullException(nameof(args));
 
-            if (_db.Features.Any(f => f.Name == args.Name))
+            if (Db.Features.Any(f => f.Name == args.Name))
                 throw new ArgumentException($"A feature with name '{args.Name}' already exists");
 
             var feature = new Feature { Name = args.Name };
@@ -35,8 +35,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
                     throw new ResourceNotFoundException<Feature>(args.Parent);
             }
 
-            _db.Features.Add(feature);
-            _db.SaveChanges();
+            Db.Features.Add(feature);
+            Db.SaveChanges();
             return feature;
         }
 
@@ -67,7 +67,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
             // 1) remove feature from groups where it is enabled
             foreach (var mapping in feature.GroupsWhereEnabled.ToList())
-                _db.FeatureToFeatureGroupMappings.Remove(mapping);
+                Db.FeatureToFeatureGroupMappings.Remove(mapping);
 
             // 2) detach from parent feature
             feature.Parent?.Children.Remove(feature);
@@ -77,8 +77,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
                 child.Parent = feature.Parent;
 
             // 4) delete feature
-            _db.Features.Remove(feature);
-            _db.SaveChanges();
+            Db.Features.Remove(feature);
+            Db.SaveChanges();
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             if (args == null)
                 throw new ArgumentNullException(nameof(args));
 
-            if (_db.Features.Any(f => f.Name == args.Name && f.Id != featureId))
+            if (Db.Features.Any(f => f.Name == args.Name && f.Id != featureId))
                 throw new ArgumentException($"A feature with name '{args.Name}' already exists");
 
             var feature = GetFeature(featureId, loadParent: true, loadChildren: true, loadGroups: true);
@@ -122,7 +122,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             newParent?.Children.Add(feature);
             feature.Parent = newParent;
 
-            _db.SaveChanges();
+            Db.SaveChanges();
         }
 
         /// <summary>
@@ -180,8 +180,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             feature.GroupsWhereEnabled.Add(mapping);
             group.EnabledFeatures.Add(mapping);
 
-            _db.FeatureToFeatureGroupMappings.Add(mapping);
-            _db.SaveChanges();
+            Db.FeatureToFeatureGroupMappings.Add(mapping);
+            Db.SaveChanges();
 
             return mapping;
 
@@ -210,8 +210,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             if (mapping==null)
                 throw new ArgumentException($"A feature '{featureId}' do not exists in group '{groupId}'");
 
-            _db.FeatureToFeatureGroupMappings.Remove(mapping);
-            _db.SaveChanges();
+            Db.FeatureToFeatureGroupMappings.Remove(mapping);
+            Db.SaveChanges();
 
         }
 
@@ -224,7 +224,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             // for authenticated users, it is the group they are assigned to
             var user = GetOrCreateUser(userId);
 
-            return _db.FeatureGroups
+            return Db.FeatureGroups
                 .Include(g => g.EnabledFeatures).ThenInclude(m => m.Feature).ThenInclude(f => f.Children)
                 .First(g => g.Id == user.FeatureGroupId); // per specification, this group must exist
         }
@@ -288,7 +288,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
                 // next parent must be explicitly loaded since usually not the whole tree structure is available here
                 // (Note: Load() doesn't work here, probably because the entity is tracked)
-                feature = _db.Entry(feature).Reference(f => f.Parent).Query().FirstOrDefault();
+                feature = Db.Entry(feature).Reference(f => f.Parent).Query().FirstOrDefault();
             }
         }
     }

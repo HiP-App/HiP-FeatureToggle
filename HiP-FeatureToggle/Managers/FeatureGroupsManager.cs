@@ -26,7 +26,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             if (args == null)
                 throw new ArgumentNullException(nameof(args));
 
-            if (_db.FeatureGroups.Any(g => g.Name == args.Name))
+            if (Db.FeatureGroups.Any(g => g.Name == args.Name))
                 throw new ArgumentException($"A feature group with name '{args.Name}' already exists");
 
             var group = new FeatureGroup { Name = args.Name };
@@ -42,8 +42,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             foreach (var user in group.Members.ToList())
                 MoveUserToGroupCore(user, group);
 
-            _db.FeatureGroups.Add(group);
-            _db.SaveChanges();
+            Db.FeatureGroups.Add(group);
+            Db.SaveChanges();
         }
 
         /// <exception cref="ResourceNotFoundException{FeatureGroup}">Group with specified ID not found</exception>
@@ -62,8 +62,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             foreach (var member in group.Members.ToList())
                 MoveUserToGroupCore(member, DefaultGroup);
 
-            _db.FeatureGroups.Remove(group);
-            _db.SaveChanges();
+            Db.FeatureGroups.Remove(group);
+            Db.SaveChanges();
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             if (args == null)
                 throw new ArgumentNullException(nameof(args));
 
-            if (_db.FeatureGroups.Any(g => g.Name == args.Name && g.Id != groupId))
+            if (Db.FeatureGroups.Any(g => g.Name == args.Name && g.Id != groupId))
                 throw new ArgumentException($"A feature group with name '{args.Name}' already exists");
 
             var group = GetGroup(groupId, loadMembers: true, loadFeatures: true);
@@ -112,7 +112,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
             var featuresToAdd = newFeatures.Where(f => !group.EnabledFeatures.Any(m => m.FeatureId == f.Id)).ToList();
 
             foreach (var mapping in featuresToRemove)
-                _db.FeatureToFeatureGroupMappings.Remove(mapping);
+                Db.FeatureToFeatureGroupMappings.Remove(mapping);
 
             // add new enabled features
             foreach (var feature in featuresToAdd)
@@ -122,7 +122,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
                 group.EnabledFeatures.Add(mapping);
             }
 
-            _db.SaveChanges();
+            Db.SaveChanges();
         }
 
         /// <exception cref="ResourceNotFoundException{FeatureGroup}">The group with specified ID does not exist</exception>
@@ -139,7 +139,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
                 throw new ResourceNotFoundException<FeatureGroup>(groupId);
 
             MoveUserToGroupCore(user, group);
-            _db.SaveChanges();
+            Db.SaveChanges();
         }
         
         private void MoveUserToGroupCore(User user, FeatureGroup group)
