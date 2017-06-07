@@ -14,14 +14,13 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
     /// <summary>
     /// Provides methods to add/modify/remove features.
     /// </summary>
-    [Authorize]
     [Route("Api/[controller]")]
     public class FeaturesController : Controller
     {
         private readonly FeaturesManager _manager;
         private readonly CmsService _cmsService;
 
-        private bool IsAdministrator => _cmsService.GetUserRole(User.Identity.GetUserIdentity()) == "Administrator";
+        private bool IsAdministrator => _cmsService.GetUserRole(User) == "Administrator";
 
         public FeaturesController(FeaturesManager manager, CmsService cmsService)
         {

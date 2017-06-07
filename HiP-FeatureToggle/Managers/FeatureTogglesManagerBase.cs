@@ -11,7 +11,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
         private static readonly User[] NoUsers = new User[0];
         private static readonly Feature[] NoFeatures = new Feature[0];
 
-        protected readonly ToggleDbContext _db;
+        protected readonly ToggleDbContext Db;
 
         /// <summary>
         /// The default group for authorized users.
@@ -25,7 +25,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
         public FeatureTogglesManagerBase(ToggleDbContext db)
         {
-            _db = db;
+            Db = db;
 
             // Load standard groups which are always available and can't be deleted.
             // If this fails, the database is not correctly initialized.
@@ -44,7 +44,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
         protected User GetOrCreateUser(string userId)
         {
-            var user = _db.Users
+            var user = Db.Users
                 .Include(nameof(User.FeatureGroup))
                 .FirstOrDefault(u => u.Id == userId);
 
@@ -53,7 +53,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
             // create new user
             var newUser = CreateUser(userId);
-            _db.SaveChanges();
+            Db.SaveChanges();
             return newUser;
         }
 
@@ -63,14 +63,14 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
                 return NoUsers;
 
             var userIdsSet = userIds.ToSet();
-            var storedUsers = _db.Users.Where(u => userIdsSet.Contains(u.Id)).ToList();
-            var missingUserIds = userIdsSet.Except(storedUsers.Select(u => u.Id));
+            var storedUsers = Db.Users.Where(u => userIdsSet.Contains(u.Id)).ToList();
+            var missingUserIds = userIdsSet.Except(storedUsers.Select(u => u.Id)).ToList();
 
             if (missingUserIds.Any())
             {
                 // Create missing users
                 var newUsers = missingUserIds.Select(CreateUser).ToList();
-                _db.SaveChanges();
+                Db.SaveChanges();
                 return storedUsers.Concat(newUsers);
             }
 
@@ -79,7 +79,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
         public IQueryable<FeatureGroup> GetAllGroups(bool loadMembers = false, bool loadFeatures = false)
         {
-            return _db.FeatureGroups
+            return Db.FeatureGroups
                 .IncludeIf(loadMembers, nameof(FeatureGroup.Members))
                 .IncludeIf(loadFeatures, nameof(FeatureGroup.EnabledFeatures));
         }
@@ -98,7 +98,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
             var featureIdsSet = featureIds.ToSet();
 
-            var storedFeatures = _db.Features
+            var storedFeatures = Db.Features
                 .IncludeIf(loadGroups, nameof(Feature.GroupsWhereEnabled))
                 .Where(f => featureIdsSet.Contains(f.Id)).ToList();
 
@@ -112,7 +112,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
         public IQueryable<Feature> GetAllFeatures(bool loadParent = false, bool loadChildren = false, bool loadGroups = false)
         {
-            return _db.Features
+            return Db.Features
                 .IncludeIf(loadParent, nameof(Feature.Parent))
                 .IncludeIf(loadChildren, nameof(Feature.Children))
                 .IncludeIf(loadGroups, nameof(Feature.GroupsWhereEnabled));
@@ -132,7 +132,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
                 FeatureGroup = DefaultGroup
             };
 
-            _db.Users.Add(user);
+            Db.Users.Add(user);
             return user;
         }
     }

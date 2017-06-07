@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Entity;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Rest;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Services;
-using PaderbornUniversity.SILab.Hip.Webservice;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,14 +12,13 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
     /// <summary>
     /// Provides methods to add/remove feature groups and to assign users to these groups.
     /// </summary>
-    [Authorize]
     [Route("Api/[controller]")]
     public class FeatureGroupsController : Controller
     {
         private readonly FeatureGroupsManager _manager;
         private readonly CmsService _cmsService;
 
-        private bool IsAdministrator => _cmsService.GetUserRole(User.Identity.GetUserIdentity()) == "Administrator";
+        private bool IsAdministrator => _cmsService.GetUserRole(User) == "Administrator";
 
         public FeatureGroupsController(FeatureGroupsManager manager, CmsService cmsService)
         {
