@@ -10,6 +10,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Rest
 
         public string Name { get; }
 
+        public bool IsProtected { get; }
+
         public IReadOnlyCollection<string> Members { get; }
 
         public IReadOnlyCollection<int> EnabledFeatures { get; }
@@ -18,6 +20,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Rest
         {
             Id = group.Id;
             Name = group.Name;
+            IsProtected = group.IsProtected;
             EnabledFeatures = group.EnabledFeatures.Select(f => f.FeatureId).ToList();
             Members = group.Members.Select(m => m.Id).ToList();
         }
