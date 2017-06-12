@@ -66,7 +66,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// </summary>
         /// <param name="groupArgs">Creation arguments</param>
         [HttpPost]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(201)]
         [ProducesResponseType(403)]
         [ProducesResponseType(409)]
         [ProducesResponseType(422)]
@@ -80,8 +80,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 
             try
             {
-                _manager.CreateGroup(groupArgs);
-                return Ok();
+                var group = _manager.CreateGroup(groupArgs);
+                return Created($"{Request.Scheme}://{Request.Host}/api/FeatureGroups/{group.Id}", group.Id);
             }
             catch (ResourceNotFoundException<Feature> e)
             {

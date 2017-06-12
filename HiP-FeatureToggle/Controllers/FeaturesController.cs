@@ -67,7 +67,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// Stores a new feature.
         /// </summary>
         [HttpPost]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
         [ProducesResponseType(409)]
@@ -82,8 +82,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 
             try
             {
-                _manager.CreateFeature(args);
-                return Ok();
+                var feature = _manager.CreateFeature(args);
+                return Created($"{Request.Scheme}://{Request.Host}/api/Features/{feature.Id}", feature.Id);
             }
             catch (ResourceNotFoundException<Feature> e)
             {
