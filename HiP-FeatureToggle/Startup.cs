@@ -88,15 +88,14 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
                        .AllowAnyOrigin()
             );
 
-            // Configure JWT-based authentication using the configuration values from appsettings*.json
-            app.UseJwtBearerAuthentication(new JwtBearerOptions
+            // Configure IdentityServer4 authentication using the configuration values from appsettings*.json
+            app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
             {
-                Audience = config.CLIENT_ID,
                 Authority = config.DOMAIN,
                 AutomaticChallenge = true,
                 AutomaticAuthenticate = true,
                 RequireHttpsMetadata = !Convert.ToBoolean(config.ALLOW_HTTP),
-                Events = new BearerEvents()
+                ApiName = "HiP-FeatureToggle"
             });
 
             app.UseMvc();
