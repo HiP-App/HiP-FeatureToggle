@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Entity;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Rest;
-using PaderbornUniversity.SILab.Hip.FeatureToggle.Services;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Utility;
 using PaderbornUniversity.SILab.Hip.Webservice;
 using System;
@@ -16,13 +15,12 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
     /// <summary>
     /// Provides methods to add/modify/remove features.
     /// </summary>
-    [Authorize]
     [Route("Api/[controller]")]
     public class FeaturesController : Controller
     {
         private readonly FeaturesManager _manager;
 
-        public FeaturesController(FeaturesManager manager, CmsService cmsService)
+        public FeaturesController(FeaturesManager manager)
         {
             _manager = manager;
         }

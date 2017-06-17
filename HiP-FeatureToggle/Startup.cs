@@ -5,13 +5,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
 using Swashbuckle.AspNetCore.Swagger;
 
 using PaderbornUniversity.SILab.Hip.Webservice;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
-using PaderbornUniversity.SILab.Hip.FeatureToggle.Services;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 {
@@ -62,7 +60,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             // Add managers
             services.AddTransient<FeatureGroupsManager>();
             services.AddTransient<FeaturesManager>();
-            services.AddTransient<CmsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -73,9 +70,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             IOptions<AppConfig> appConfig,
             ToggleDbContext dbContext)
         {
-            // Retrieve the AppConfig reference from the IOptions type:
-            var config = appConfig.Value;
-
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             if (env.IsDevelopment())
             {
@@ -91,10 +85,10 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             // Configure IdentityServer4 authentication using the configuration values from appsettings*.json
             app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
             {
-                Authority = config.DOMAIN,
+                Authority = "http://localhost:5001",
                 AutomaticChallenge = true,
                 AutomaticAuthenticate = true,
-                RequireHttpsMetadata = !Convert.ToBoolean(config.ALLOW_HTTP),
+                RequireHttpsMetadata = false,
                 ApiName = "HiP-FeatureToggle"
             });
 
