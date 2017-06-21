@@ -66,7 +66,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// </summary>
         /// <param name="groupArgs">Creation arguments</param>
         [HttpPost]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(201)]
         [ProducesResponseType(403)]
         [ProducesResponseType(409)]
         [ProducesResponseType(422)]
@@ -80,8 +80,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 
             try
             {
-                _manager.CreateGroup(groupArgs);
-                return Ok();
+                var group = _manager.CreateGroup(groupArgs);
+                return Created($"{Request.Scheme}://{Request.Host}/api/FeatureGroups/{group.Id}", group.Id);
             }
             catch (ResourceNotFoundException<Feature> e)
             {
@@ -97,7 +97,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// Deletes a feature group. Members are moved to the default group.
         /// </summary>
         [HttpDelete("{groupId}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
         [ProducesResponseType(409)]
@@ -119,14 +119,14 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
                 return StatusCode(409, e.Message); // tried to delete protected group
             }
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
         /// Updates a feature group.
         /// </summary>
         [HttpPut("{groupId}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
@@ -141,7 +141,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             try
             {
                 _manager.UpdateGroup(groupId, groupArgs);
-                return Ok();
+                return NoContent();
             }
             catch (ResourceNotFoundException<FeatureGroup> e)
             {
@@ -167,7 +167,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut("/Api/Users/{userId}/FeatureGroup/{groupId}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
         [ProducesResponseType(409)]
@@ -188,7 +188,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             {
                 return StatusCode(409, e.Message); // tried to move user to public group
             }
-            return Ok();
+            return NoContent();
         }
     }
 }

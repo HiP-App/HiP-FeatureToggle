@@ -67,7 +67,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// Stores a new feature.
         /// </summary>
         [HttpPost]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
         [ProducesResponseType(409)]
@@ -82,8 +82,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 
             try
             {
-                _manager.CreateFeature(args);
-                return Ok();
+                var feature = _manager.CreateFeature(args);
+                return Created($"{Request.Scheme}://{Request.Host}/api/Features/{feature.Id}", feature.Id);
             }
             catch (ResourceNotFoundException<Feature> e)
             {
@@ -101,7 +101,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// <param name="featureId"></param>
         /// <returns></returns>
         [HttpDelete("{featureId}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
         public IActionResult Delete(int featureId)
@@ -112,7 +112,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             try
             {
                 _manager.DeleteFeature(featureId);
-                return Ok();
+                return NoContent();
             }
             catch (ResourceNotFoundException e)
             {
@@ -124,7 +124,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// Updates a feature. If the reference to the parent is modified, this moves the whole subtree of features.
         /// </summary>
         [HttpPut("{featureId}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
         [ProducesResponseType(409)]
@@ -140,7 +140,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             try
             {
                 _manager.UpdateFeature(featureId, args);
-                return Ok();
+                return NoContent();
             }
             catch (ArgumentException e)
             {
@@ -185,7 +185,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         }
 
         [HttpPut("{featureId}/Group/{groupId}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
         [ProducesResponseType(409)]
@@ -197,7 +197,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             try
             {
                 _manager.EnableFeautureForGroup(featureId, groupId);
-                return Ok();
+                return NoContent();
             }
             catch (ResourceNotFoundException e) 
             {
@@ -210,7 +210,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         }
 
         [HttpDelete("{featureId}/Group/{groupId}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
         [ProducesResponseType(409)]
@@ -222,7 +222,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             try
             {
                 _manager.DisableFeatureForGroup(featureId, groupId);
-                return Ok();
+                return NoContent();
             }
             catch (ResourceNotFoundException e)
             {

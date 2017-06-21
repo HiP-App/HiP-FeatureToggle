@@ -21,7 +21,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
         /// <exception cref="ArgumentNullException">Specified argument is null</exception>
         /// <exception cref="ArgumentException">A feature group with the specified name already exists</exception>
         /// <exception cref="ResourceNotFoundException{Feature}">A referenced feature does not exist</exception>
-        public void CreateGroup(FeatureGroupArgs args)
+        public FeatureGroup CreateGroup(FeatureGroupArgs args)
         {
             if (args == null)
                 throw new ArgumentNullException(nameof(args));
@@ -44,6 +44,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 
             Db.FeatureGroups.Add(group);
             Db.SaveChanges();
+            return group;
         }
 
         /// <exception cref="ResourceNotFoundException{FeatureGroup}">Group with specified ID not found</exception>
