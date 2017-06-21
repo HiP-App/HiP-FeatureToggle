@@ -20,5 +20,21 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Utility
             var role = claimsIdentity.FindAll("role");
             return role.ToList();
         }
-}
+
+        /// <summary>
+        /// Checks if the user has Administrator permission
+        /// </summary>
+        public static bool IsAdministrator(IIdentity identity)
+        {
+            try
+            {
+                var roles = identity.GetUserRoles();
+                return roles.Any(r => r.Value.Equals("Administrator"));
+            }
+            catch (InvalidOperationException)
+            {
+                return false;
+            }
+        }
+    }
 }

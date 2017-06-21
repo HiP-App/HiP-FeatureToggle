@@ -85,7 +85,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             // Configure IdentityServer4 authentication using the configuration values from appsettings*.json
             app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
             {
-                Authority = "http://localhost:5001",
+                Authority = "http://localhost:5001/",
                 AutomaticChallenge = true,
                 AutomaticAuthenticate = true,
                 RequireHttpsMetadata = false,

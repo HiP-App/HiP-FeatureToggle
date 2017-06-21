@@ -6,7 +6,7 @@ using PaderbornUniversity.SILab.Hip.FeatureToggle.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Principal;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 {
@@ -14,6 +14,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
     /// Provides methods to add/remove feature groups and to assign users to these groups.
     /// </summary>
     [Route("Api/[controller]")]
+    [Authorize]
     public class FeatureGroupsController : Controller
     {
         private readonly FeatureGroupsManager _manager;
@@ -31,7 +32,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(403)]
         public IActionResult GetAll()
         {
-            if (!IsAdministrator(User.Identity))
+            if (!Auth.IsAdministrator(User.Identity))
                 return Forbid();
 
             var groups = _manager.GetAllGroups(loadMembers: true, loadFeatures: true);
@@ -47,7 +48,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(403)]
         public IActionResult GetById(int groupId)
         {
-            if (!IsAdministrator(User.Identity))
+            if (!Auth.IsAdministrator(User.Identity))
                 return Forbid();
 
             var group = _manager.GetGroup(groupId, loadMembers: true, loadFeatures: true);
@@ -69,7 +70,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(422)]
         public IActionResult Create([FromBody]FeatureGroupArgs groupArgs)
         {
-            if (!IsAdministrator(User.Identity))
+            if (!Auth.IsAdministrator(User.Identity))
                 return Forbid();
 
             if (!ModelState.IsValid)
@@ -100,7 +101,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(409)]
         public IActionResult Delete(int groupId)
         {
-            if (!IsAdministrator(User.Identity))
+            if (!Auth.IsAdministrator(User.Identity))
                 return Forbid();
 
             try
@@ -129,7 +130,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(404)]
         public IActionResult Update(int groupId, [FromBody]FeatureGroupArgs groupArgs)
         {
-            if (!IsAdministrator(User.Identity))
+            if (!Auth.IsAdministrator(User.Identity))
                 return Forbid();
 
             if (!ModelState.IsValid)
@@ -170,7 +171,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(409)]
         public IActionResult AssignMember(string userId, int groupId)
         {
-            if (!IsAdministrator(User.Identity))
+            if (!Auth.IsAdministrator(User.Identity))
                 return Forbid();
 
             try
@@ -186,22 +187,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
                 return StatusCode(409, e.Message); // tried to move user to public group
             }
             return Ok();
-        }
-
-        /// <summary>
-        /// Checks if the user has Administrator permission
-        /// </summary>
-        private bool IsAdministrator(IIdentity identity)
-        {
-            try
-            {
-                var roles = identity.GetUserRoles();
-                return roles.Any(r => r.Value.Equals("Administrator"));
-            }
-            catch (InvalidOperationException)
-            {
-                return false;
-            }
         }
     }
 }
