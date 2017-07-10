@@ -63,7 +63,11 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
                 return NoUsers;
 
             var userIdsSet = userIds.ToSet();
-            var storedUsers = Db.Users.Where(u => userIdsSet.Contains(u.Id)).ToList();
+
+            var storedUsers = Db.Users.Where(u => userIdsSet.Contains(u.Id))
+                .Include(nameof(User.FeatureGroup))
+                .ToList();
+
             var missingUserIds = userIdsSet.Except(storedUsers.Select(u => u.Id)).ToList();
 
             if (missingUserIds.Any())
