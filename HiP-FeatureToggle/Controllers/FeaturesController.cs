@@ -32,6 +32,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(403)]
         public IActionResult GetAll()
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             var features = _manager.GetAllFeatures(loadChildren: true, loadGroups: true);
             var results = features.ToList().Select(f => new FeatureResult(f));
             return Ok(results);
@@ -45,6 +48,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(403)]
         public IActionResult GetById(int featureId)
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             var feature = _manager.GetFeature(featureId, loadChildren: true, loadGroups: true);
 
             if (feature == null)
@@ -64,6 +70,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(422)]
         public IActionResult Create([FromBody]FeatureArgs args)
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -93,6 +102,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(404)]
         public IActionResult Delete(int featureId)
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             try
             {
                 _manager.DeleteFeature(featureId);
@@ -115,6 +127,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(422)]
         public IActionResult Update(int featureId, [FromBody]FeatureArgs args)
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -152,6 +167,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(404)]
         public IActionResult IsFeatureEnabledForCurrentUser(int featureId)
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             var userId = User.Identity.IsAuthenticated ? User.Identity.GetUserIdentity() : null;
 
             try
@@ -172,6 +190,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(409)]
         public IActionResult EnableFeautureForGroup(int featureId,int groupId)
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             try
             {
                 _manager.EnableFeautureForGroup(featureId, groupId);
@@ -194,6 +215,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(409)]
         public IActionResult DisableFeautureForGroup(int featureId, int groupId)
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             try
             {
                 _manager.DisableFeatureForGroup(featureId, groupId);
@@ -219,6 +243,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(typeof(IEnumerable<FeatureResult>), 200)]
         public IActionResult GetEnabledFeaturesForCurrentUser()
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             var userId = User.Identity.IsAuthenticated ? User.Identity.GetUserIdentity() : null;
             var features = _manager.GetEffectivelyEnabledFeaturesForUser(userId);
             return Ok(features.Select(f => new FeatureResult(f)));

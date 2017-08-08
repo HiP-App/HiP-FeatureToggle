@@ -31,6 +31,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(403)]
         public IActionResult GetAll()
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             var groups = _manager.GetAllGroups(loadMembers: true, loadFeatures: true);
             var results = groups.ToList().Select(g => new FeatureGroupResult(g)); // note: ToList() is required here
             return Ok(results);
@@ -44,6 +47,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(403)]
         public IActionResult GetById(int groupId)
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             var group = _manager.GetGroup(groupId, loadMembers: true, loadFeatures: true);
 
             if (group == null)
@@ -63,6 +69,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(422)]
         public IActionResult Create([FromBody]FeatureGroupArgs groupArgs)
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -91,6 +100,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(409)]
         public IActionResult Delete(int groupId)
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             try
             {
                 _manager.RemoveGroup(groupId);
@@ -117,6 +129,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(404)]
         public IActionResult Update(int groupId, [FromBody]FeatureGroupArgs groupArgs)
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -155,6 +170,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(409)]
         public IActionResult AssignMember(string userId, int groupId)
         {
+            if (!Utility.Auth.IsAdministrator(User.Identity))
+                return Forbid();
+
             try
             {
                 _manager.MoveUserToGroup(userId, groupId);
