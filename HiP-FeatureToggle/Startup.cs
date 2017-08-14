@@ -44,9 +44,11 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             services.AddAuthorization(options =>
                 {
                 options.AddPolicy("read:featuretoggle",
-                policy => policy.Requirements.Add(new HasScopeRequirement("read:datastore", domain)));
+                policy => policy.Requirements.Add(new HasScopeRequirement("read:featuretoggle", domain)));
                 options.AddPolicy("write:featuretoggle",
-                policy => policy.Requirements.Add(new HasScopeRequirement("write:datastore", domain)));
+                policy => policy.Requirements.Add(new HasScopeRequirement("write:featuretoggle", domain)));
+                options.AddPolicy("write:cms",
+                policy => policy.Requirements.Add(new HasScopeRequirement("write:cms", domain)));
                 });
 
             // Add Cross Orign Requests 
