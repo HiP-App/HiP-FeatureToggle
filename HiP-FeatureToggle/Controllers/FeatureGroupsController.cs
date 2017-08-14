@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 {
@@ -17,10 +18,12 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
     public class FeatureGroupsController : Controller
     {
         private readonly FeatureGroupsManager _manager;
+        private readonly UserPermissions _userPermissions;
 
-        public FeatureGroupsController(FeatureGroupsManager manager)
+        public FeatureGroupsController(FeatureGroupsManager manager, ToggleDbContext dbContext)
         {
             _manager = manager;
+            _userPermissions = new UserPermissions(dbContext);
         }
 
         /// <summary>
@@ -31,7 +34,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(403)]
         public IActionResult GetAll()
         {
-            if (!Utility.Auth.IsAdministrator(User.Identity))
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             var groups = _manager.GetAllGroups(loadMembers: true, loadFeatures: true);
@@ -47,7 +50,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(403)]
         public IActionResult GetById(int groupId)
         {
-            if (!Utility.Auth.IsAdministrator(User.Identity))
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             var group = _manager.GetGroup(groupId, loadMembers: true, loadFeatures: true);
@@ -69,7 +72,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(422)]
         public IActionResult Create([FromBody]FeatureGroupArgs groupArgs)
         {
-            if (!Utility.Auth.IsAdministrator(User.Identity))
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             if (!ModelState.IsValid)
@@ -100,7 +103,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(409)]
         public IActionResult Delete(int groupId)
         {
-            if (!Utility.Auth.IsAdministrator(User.Identity))
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             try
@@ -129,7 +132,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(404)]
         public IActionResult Update(int groupId, [FromBody]FeatureGroupArgs groupArgs)
         {
-            if (!Utility.Auth.IsAdministrator(User.Identity))
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             if (!ModelState.IsValid)
@@ -170,7 +173,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(409)]
         public IActionResult AssignMember(string userId, int groupId)
         {
-            if (!Utility.Auth.IsAdministrator(User.Identity))
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             try
