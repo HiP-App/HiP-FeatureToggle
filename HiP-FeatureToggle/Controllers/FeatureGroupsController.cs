@@ -2,28 +2,28 @@
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Entity;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Rest;
-using PaderbornUniversity.SILab.Hip.FeatureToggle.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 {
     /// <summary>
     /// Provides methods to add/remove feature groups and to assign users to these groups.
     /// </summary>
+    [Authorize]
     [Route("Api/[controller]")]
     public class FeatureGroupsController : Controller
     {
         private readonly FeatureGroupsManager _manager;
-        private readonly CmsService _cmsService;
+        private readonly UserPermissions _userPermissions;
 
-        private bool IsAdministrator => _cmsService.GetUserRole(User) == "Administrator";
-
-        public FeatureGroupsController(FeatureGroupsManager manager, CmsService cmsService)
+        public FeatureGroupsController(FeatureGroupsManager manager, ToggleDbContext dbContext)
         {
             _manager = manager;
-            _cmsService = cmsService;
+            _userPermissions = new UserPermissions(dbContext);
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(403)]
         public IActionResult GetAll()
         {
-            if (!IsAdministrator)
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             var groups = _manager.GetAllGroups(loadMembers: true, loadFeatures: true);
@@ -50,7 +50,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(403)]
         public IActionResult GetById(int groupId)
         {
-            if (!IsAdministrator)
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             var group = _manager.GetGroup(groupId, loadMembers: true, loadFeatures: true);
@@ -72,7 +72,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(422)]
         public IActionResult Create([FromBody]FeatureGroupArgs groupArgs)
         {
-            if (!IsAdministrator)
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             if (!ModelState.IsValid)
@@ -103,7 +103,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(409)]
         public IActionResult Delete(int groupId)
         {
-            if (!IsAdministrator)
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             try
@@ -132,7 +132,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(404)]
         public IActionResult Update(int groupId, [FromBody]FeatureGroupArgs groupArgs)
         {
-            if (!IsAdministrator)
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             if (!ModelState.IsValid)
@@ -173,7 +173,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(409)]
         public IActionResult AssignMember(string userId, int groupId)
         {
-            if (!IsAdministrator)
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             try
