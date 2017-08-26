@@ -13,7 +13,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
     /// <summary>
     /// Provides methods to add/remove feature groups and to assign users to these groups.
     /// </summary>
-    [Authorize]
     [Route("Api/[controller]")]
     public class FeatureGroupsController : Controller
     {
@@ -29,6 +28,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// <summary>
         /// Gets all feature groups.
         /// </summary>
+        [Authorize("read:featuretoggle")]
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<FeatureGroupResult>), 200)]
         [ProducesResponseType(403)]
@@ -45,6 +45,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// <summary>
         /// Gets a specific feature group by ID.
         /// </summary>
+        [Authorize("read:featuretoggle")]
         [HttpGet("{groupId}")]
         [ProducesResponseType(typeof(FeatureGroupResult), 200)]
         [ProducesResponseType(403)]
@@ -65,6 +66,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// Stores a new feature group.
         /// </summary>
         /// <param name="groupArgs">Creation arguments</param>
+        [Authorize("write:featuretoggle")]
         [HttpPost]
         [ProducesResponseType(201)]
         [ProducesResponseType(403)]
@@ -96,6 +98,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// <summary>
         /// Deletes a feature group. Members are moved to the default group.
         /// </summary>
+        [Authorize("write:featuretoggle")]
         [HttpDelete("{groupId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(403)]
@@ -125,6 +128,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// <summary>
         /// Updates a feature group.
         /// </summary>
+        [Authorize("write:featuretoggle")]
         [HttpPut("{groupId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -166,6 +170,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// Removes a user from its current feature group and assigns it to a new feature group.
         /// </summary>
         /// <returns></returns>
+        [Authorize("write:featuretoggle")]
         [HttpPut("/Api/Users/{userId}/FeatureGroup/{groupId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(403)]

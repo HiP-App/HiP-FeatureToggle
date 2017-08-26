@@ -14,7 +14,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
     /// <summary>
     /// Provides methods to add/modify/remove features.
     /// </summary>
-    [Authorize]
     [Route("Api/[controller]")]
     public class FeaturesController : Controller
     {
@@ -30,6 +29,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// <summary>
         /// Gets all features.
         /// </summary>
+        [Authorize("read:featuretoggle")]
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<FeatureResult>), 200)]
         [ProducesResponseType(403)]
@@ -46,6 +46,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// <summary>
         /// Gets a specific feature by ID.
         /// </summary>
+        [Authorize("read:featuretoggle")]
         [HttpGet("{featureId}")]
         [ProducesResponseType(typeof(FeatureResult), 200)]
         [ProducesResponseType(403)]
@@ -65,6 +66,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// <summary>
         /// Stores a new feature.
         /// </summary>
+        [Authorize("write:featuretoggle")]
         [HttpPost]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
@@ -99,6 +101,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// </summary>
         /// <param name="featureId"></param>
         /// <returns></returns>
+        [Authorize("write:featuretoggle")]
         [HttpDelete("{featureId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(403)]
@@ -122,6 +125,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// <summary>
         /// Updates a feature. If the reference to the parent is modified, this moves the whole subtree of features.
         /// </summary>
+        [Authorize("write:featuretoggle")]
         [HttpPut("{featureId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(403)]
@@ -164,6 +168,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// This is the case if the user is assigned to a feature group in which the feature
         /// and all its ancestor features are enabled.
         /// </summary>
+        [Authorize("read:featuretoggle")]
         [HttpGet("{featureId}/IsEnabled")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(bool), 200)]
@@ -186,6 +191,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             }
         }
 
+        [Authorize("write:featuretoggle")]
         [HttpPut("{featureId}/Group/{groupId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(403)]
@@ -211,6 +217,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             }
         }
 
+        [Authorize("write:featuretoggle")]
         [HttpDelete("{featureId}/Group/{groupId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(403)]
@@ -241,6 +248,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// These are all features X where X itself and all ancestor features of X are enabled in the
         /// group the user is assigned to.
         /// </summary>
+        [Authorize("read:featuretoggle")]
         [HttpGet("IsEnabled")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<FeatureResult>), 200)]

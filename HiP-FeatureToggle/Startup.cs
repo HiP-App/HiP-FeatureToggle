@@ -80,7 +80,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             IHostingEnvironment env,
             ILoggerFactory loggerFactory,
             IOptions<AppConfig> appConfig,
-            ToggleDbContext dbContext, IOptions<AuthConfig> authConfig)
+            ToggleDbContext dbContext,
+            IOptions<AuthConfig> authConfig)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             if (env.IsDevelopment())
