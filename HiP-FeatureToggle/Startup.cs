@@ -40,6 +40,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             services.Configure<AppConfig>(Configuration);
             services.Configure<AuthConfig>(Configuration.GetSection("Auth"));
 
+            //Adding authorization
             string domain = Configuration.GetSection("Auth").GetValue<string>("Authority");
             services.AddAuthorization(options =>
                 {
