@@ -149,7 +149,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             {
                 return StatusCode(409, e.Message); // new feature name already in use
             }
-            catch (ResourceNotFoundException<Feature> e) when ((int)e.Keys.FirstOrDefault() == featureId)
+            catch (ResourceNotFoundException<Feature> e) when ((int?)e.Keys.FirstOrDefault() == featureId)
             {
                 return NotFound(e.Message); // feature to be updated does not exist
             }
