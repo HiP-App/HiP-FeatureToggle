@@ -161,10 +161,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             {
                 return StatusCode(409, e.Message); // invalid parent modification
             }
-            catch (NullReferenceException e)
-            {
-                return NotFound(e.Message); // feature to be updated does not exist
-            }
         }
 
         /// <summary>
