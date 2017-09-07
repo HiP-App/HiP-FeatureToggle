@@ -6,11 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
-
 using PaderbornUniversity.SILab.Hip.Webservice;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
-using PaderbornUniversity.SILab.Hip.FeatureToggle.Services;
+using PaderbornUniversity.SILab.Hip.FeatureToggle.Utility;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 {
@@ -39,6 +38,19 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             // Inject a configuration with the properties from AppConfig that
             // match the given Configuration (which was loaded in the constructor).
             services.Configure<AppConfig>(Configuration);
+            services.Configure<AuthConfig>(Configuration.GetSection("Auth"));
+
+            //Adding authorization
+            string domain = Configuration.GetSection("Auth").GetValue<string>("Authority");
+            services.AddAuthorization(options =>
+                {
+                options.AddPolicy("read:featuretoggle",
+                policy => policy.Requirements.Add(new HasScopeRequirement("read:featuretoggle", domain)));
+                options.AddPolicy("write:featuretoggle",
+                policy => policy.Requirements.Add(new HasScopeRequirement("write:featuretoggle", domain)));
+                options.AddPolicy("write:cms",
+                policy => policy.Requirements.Add(new HasScopeRequirement("write:cms", domain)));
+                });
 
             // Add Cross Orign Requests 
             services.AddCors();
@@ -61,7 +73,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             // Add managers
             services.AddTransient<FeatureGroupsManager>();
             services.AddTransient<FeaturesManager>();
-            services.AddTransient<CmsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,7 +81,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             IHostingEnvironment env,
             ILoggerFactory loggerFactory,
             IOptions<AppConfig> appConfig,
-            ToggleDbContext dbContext)
+            ToggleDbContext dbContext,
+            IOptions<AuthConfig> authConfig)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             if (env.IsDevelopment())
@@ -84,19 +96,12 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
                        .AllowAnyOrigin()
             );
 
-            // Configure JWT-based authentication using the configuration values from appsettings*.json
-            // TODO: Uncomment to re-enable authentication
-            //// Retrieve the AppConfig reference from the IOptions type:
-            //var config = appConfig.Value;
-            //app.UseJwtBearerAuthentication(new JwtBearerOptions
-            //{
-            //    Audience = config.CLIENT_ID,
-            //    Authority = config.DOMAIN,
-            //    AutomaticChallenge = true,
-            //    AutomaticAuthenticate = true,
-            //    RequireHttpsMetadata = !Convert.ToBoolean(config.ALLOW_HTTP),
-            //    Events = new BearerEvents()
-            //});
+            var options = new JwtBearerOptions
+            {
+                Audience = authConfig.Value.Audience,
+                Authority = authConfig.Value.Authority
+            };
+            app.UseJwtBearerAuthentication(options);
 
             app.UseMvc();
 

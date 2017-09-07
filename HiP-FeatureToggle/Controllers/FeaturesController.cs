@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Entity;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Rest;
-using PaderbornUniversity.SILab.Hip.FeatureToggle.Services;
 using PaderbornUniversity.SILab.Hip.Webservice;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 {
@@ -18,25 +18,24 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
     public class FeaturesController : Controller
     {
         private readonly FeaturesManager _manager;
-        private readonly CmsService _cmsService;
+        private readonly UserPermissions _userPermissions;
 
-        private bool IsAdministrator => _cmsService.GetUserRole(User) == "Administrator";
-
-        public FeaturesController(FeaturesManager manager, CmsService cmsService)
+        public FeaturesController(FeaturesManager manager, ToggleDbContext dbContext)
         {
             _manager = manager;
-            _cmsService = cmsService;
+            _userPermissions = new UserPermissions(dbContext);
         }
 
         /// <summary>
         /// Gets all features.
         /// </summary>
+        [Authorize("read:featuretoggle")]
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<FeatureResult>), 200)]
         [ProducesResponseType(403)]
         public IActionResult GetAll()
         {
-            if (!IsAdministrator)
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             var features = _manager.GetAllFeatures(loadChildren: true, loadGroups: true);
@@ -47,12 +46,13 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// <summary>
         /// Gets a specific feature by ID.
         /// </summary>
+        [Authorize("read:featuretoggle")]
         [HttpGet("{featureId}")]
         [ProducesResponseType(typeof(FeatureResult), 200)]
         [ProducesResponseType(403)]
         public IActionResult GetById(int featureId)
         {
-            if (!IsAdministrator)
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             var feature = _manager.GetFeature(featureId, loadChildren: true, loadGroups: true);
@@ -66,6 +66,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// <summary>
         /// Stores a new feature.
         /// </summary>
+        [Authorize("write:featuretoggle")]
         [HttpPost]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
@@ -74,7 +75,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(422)]
         public IActionResult Create([FromBody]FeatureArgs args)
         {
-            if (!IsAdministrator)
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             if (!ModelState.IsValid)
@@ -100,13 +101,14 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// </summary>
         /// <param name="featureId"></param>
         /// <returns></returns>
+        [Authorize("write:featuretoggle")]
         [HttpDelete("{featureId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
         public IActionResult Delete(int featureId)
         {
-            if (!IsAdministrator)
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             try
@@ -123,6 +125,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// <summary>
         /// Updates a feature. If the reference to the parent is modified, this moves the whole subtree of features.
         /// </summary>
+        [Authorize("write:featuretoggle")]
         [HttpPut("{featureId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(403)]
@@ -131,7 +134,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(422)]
         public IActionResult Update(int featureId, [FromBody]FeatureArgs args)
         {
-            if (!IsAdministrator)
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             if (!ModelState.IsValid)
@@ -146,7 +149,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             {
                 return StatusCode(409, e.Message); // new feature name already in use
             }
-            catch (ResourceNotFoundException<Feature> e) when ((int)e.Keys.FirstOrDefault() == featureId)
+            catch (ResourceNotFoundException<Feature> e) when ((int?)e.Keys.FirstOrDefault() == featureId)
             {
                 return NotFound(e.Message); // feature to be updated does not exist
             }
@@ -165,12 +168,16 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// This is the case if the user is assigned to a feature group in which the feature
         /// and all its ancestor features are enabled.
         /// </summary>
+        [Authorize("read:featuretoggle")]
         [HttpGet("{featureId}/IsEnabled")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(bool), 200)]
         [ProducesResponseType(404)]
         public IActionResult IsFeatureEnabledForCurrentUser(int featureId)
         {
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
+                return Forbid();
+
             var userId = User.Identity.IsAuthenticated ? User.Identity.GetUserIdentity() : null;
 
             try
@@ -184,6 +191,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             }
         }
 
+        [Authorize("write:featuretoggle")]
         [HttpPut("{featureId}/Group/{groupId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(403)]
@@ -191,7 +199,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(409)]
         public IActionResult EnableFeautureForGroup(int featureId,int groupId)
         {
-            if (!IsAdministrator)
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             try
@@ -209,6 +217,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             }
         }
 
+        [Authorize("write:featuretoggle")]
         [HttpDelete("{featureId}/Group/{groupId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(403)]
@@ -216,7 +225,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(409)]
         public IActionResult DisableFeautureForGroup(int featureId, int groupId)
         {
-            if (!IsAdministrator)
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             try
@@ -239,11 +248,15 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// These are all features X where X itself and all ancestor features of X are enabled in the
         /// group the user is assigned to.
         /// </summary>
+        [Authorize("read:featuretoggle")]
         [HttpGet("IsEnabled")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<FeatureResult>), 200)]
         public IActionResult GetEnabledFeaturesForCurrentUser()
         {
+            if (!_userPermissions.IsAllowedToAdminister(User.Identity))
+                return Forbid();
+
             var userId = User.Identity.IsAuthenticated ? User.Identity.GetUserIdentity() : null;
             var features = _manager.GetEffectivelyEnabledFeaturesForUser(userId);
             return Ok(features.Select(f => new FeatureResult(f)));
