@@ -7,7 +7,6 @@ using PaderbornUniversity.SILab.Hip.Webservice;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 {
