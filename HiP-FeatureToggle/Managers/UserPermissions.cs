@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Principal;
-using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Utility;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Managers
 {
-    public class UserPermissions : FeatureTogglesManagerBase
+    public static class UserPermissions
     {
-        public UserPermissions(ToggleDbContext dbContext) : base(dbContext) { }
-
-        public bool IsAllowedToAdminister(IIdentity identity)
+        public static bool IsAllowedToAdminister(IIdentity identity)
         {
             try
             {
