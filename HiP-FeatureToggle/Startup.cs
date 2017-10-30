@@ -10,6 +10,8 @@ using PaderbornUniversity.SILab.Hip.Webservice;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Utility;
+using System.IO;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 {
@@ -40,19 +42,31 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             services.Configure<AppConfig>(Configuration);
             services.Configure<AuthConfig>(Configuration.GetSection("Auth"));
 
-            //Adding authorization
-            string domain = Configuration.GetSection("Auth").GetValue<string>("Authority");
-            services.AddAuthorization(options =>
+            var serviceProvider = services.BuildServiceProvider(); // allows us to actually get the configured services
+            var authConfig = serviceProvider.GetService<IOptions<AuthConfig>>();
+
+            // Configure authentication
+            services
+                .AddAuthentication(options => options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
                 {
-                options.AddPolicy("read:featuretoggle",
-                policy => policy.Requirements.Add(new HasScopeRequirement("read:featuretoggle", domain)));
-                options.AddPolicy("write:featuretoggle",
-                policy => policy.Requirements.Add(new HasScopeRequirement("write:featuretoggle", domain)));
-                options.AddPolicy("write:cms",
-                policy => policy.Requirements.Add(new HasScopeRequirement("write:cms", domain)));
+                    options.Audience = authConfig.Value.Audience;
+                    options.Authority = authConfig.Value.Authority;
                 });
 
-            // Add Cross Orign Requests 
+            // Configure authorization
+            var domain = authConfig.Value.Authority;
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("read:featuretoggle",
+                    policy => policy.Requirements.Add(new HasScopeRequirement("read:featuretoggle", domain)));
+                options.AddPolicy("write:featuretoggle",
+                    policy => policy.Requirements.Add(new HasScopeRequirement("write:featuretoggle", domain)));
+                options.AddPolicy("write:cms",
+                    policy => policy.Requirements.Add(new HasScopeRequirement("write:cms", domain)));
+            });
+            
+            // Add Cross Origin Requests 
             services.AddCors();
 
             services.AddDbContext<ToggleDbContext>(
@@ -65,6 +79,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
                 // Define a Swagger document
                 c.SwaggerDoc("v1", new Info() { Title = Name, Version = Version });
                 c.OperationFilter<CustomSwaggerOperationFilter>();
+                c.IncludeXmlComments(Path.ChangeExtension(typeof(Startup).Assembly.Location, ".xml"));
             });
 
             // Add framework services.
@@ -85,24 +100,16 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             IOptions<AuthConfig> authConfig)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+
             if (env.IsDevelopment())
-            {
                 loggerFactory.AddDebug();
-            }
 
-            app.UseCors(builder =>
-                builder.AllowAnyHeader()
-                       .AllowAnyMethod()
-                       .AllowAnyOrigin()
-            );
+            app.UseCors(builder => builder
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowAnyOrigin());
 
-            var options = new JwtBearerOptions
-            {
-                Audience = authConfig.Value.Audience,
-                Authority = authConfig.Value.Authority
-            };
-            app.UseJwtBearerAuthentication(options);
-
+            app.UseAuthentication();
             app.UseMvc();
 
             // Swagger / Swashbuckle configuration:
@@ -112,6 +119,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             {
                 c.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.Host = httpReq.Host.Value);
             });
+
             // Configure SwaggerUI endpoint
             app.UseSwaggerUI(c =>
             {
