@@ -242,3 +242,7 @@ web.config
 appsettings.Development.json
 test/Api.Tests/appsettings.json
 test/Api.Tests/testconfig.json
+
+#Generated files from NSwag
+HiP-FeatureToggle.Sdk/swagger.json
+HiP-FeatureToggle.Sdk/*.g.cs
