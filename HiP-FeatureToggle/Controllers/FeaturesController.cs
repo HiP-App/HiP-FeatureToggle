@@ -188,6 +188,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             }
         }
 
+        /// <summary>
+        /// Enables a feature for a specific feature group.
+        /// </summary>
         [Authorize("write:featuretoggle")]
         [HttpPut("{featureId}/Group/{groupId}")]
         [ProducesResponseType(204)]
@@ -214,6 +217,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             }
         }
 
+        /// <summary>
+        /// Disables a feature for a specific feature group.
+        /// </summary>
         [Authorize("write:featuretoggle")]
         [HttpDelete("{featureId}/Group/{groupId}")]
         [ProducesResponseType(204)]
