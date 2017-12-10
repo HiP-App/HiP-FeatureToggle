@@ -11,7 +11,9 @@ See [Getting Started](https://github.com/HiP-App/HiP-CmsWebApi#getting-started) 
 
 # Core Concepts
 
-The service manages a hierarchy (tree) of *features* and a list of *feature groups*. A feature consists of an ID and a descriptive name (e.g. "Can See Seminar Content"). A feature group (better thought of as a "user group") consists of an ID, a name (e.g. "Beta testers"), a list of users ("members") belonging to that group, and a list of features that are enabled for the members of the group. Each user belongs to exactly one group. There are two special, pre-defined groups:
+The service manages a hierarchy (tree) of *features* and a list of *feature groups*.
+
+A feature consists of an ID and a descriptive name (e.g. "Can See Seminar Content"). A feature group (better thought of as a "user group") consists of an ID, a name (e.g. "Beta testers"), a list of users ("members") belonging to that group, and a list of features that are enabled for the members of the group. Each user belongs to exactly one group. There are two special, pre-defined groups:
 
 * 'Default': If a user has not (yet) been assigned to a group, he/she is in the default group. Furthermore, deleting a group moves all its members to the 'Default'-group again.
 * 'Public': This group only applies to unauthenticated, anonymous users. Users cannot be explicitly assigned to this group.

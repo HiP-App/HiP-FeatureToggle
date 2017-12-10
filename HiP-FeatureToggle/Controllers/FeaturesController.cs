@@ -172,9 +172,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(404)]
         public IActionResult IsFeatureEnabledForCurrentUser(int featureId)
         {
-            if (!UserPermissions.IsAllowedToAdminister(User.Identity))
-                return Forbid();
-
             var userId = User.Identity.IsAuthenticated ? User.Identity.GetUserIdentity() : null;
 
             try
@@ -257,9 +254,6 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         [ProducesResponseType(typeof(IEnumerable<FeatureResult>), 200)]
         public IActionResult GetEnabledFeaturesForCurrentUser()
         {
-            if (!UserPermissions.IsAllowedToAdminister(User.Identity))
-                return Forbid();
-
             var userId = User.Identity.IsAuthenticated ? User.Identity.GetUserIdentity() : null;
             var features = _manager.GetEffectivelyEnabledFeaturesForUser(userId);
             return Ok(features.Select(f => new FeatureResult(f)));
