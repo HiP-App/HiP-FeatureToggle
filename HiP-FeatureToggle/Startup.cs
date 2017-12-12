@@ -35,11 +35,12 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
         {
             // Inject a configuration with the properties from AppConfig that
             // match the given Configuration (which was loaded in the constructor).
-            services.Configure<AppConfig>(Configuration);
+            services.Configure<DatabaseConfig>(Configuration.GetSection("Database"));
             services.Configure<AuthConfig>(Configuration.GetSection("Auth"));
 
             var serviceProvider = services.BuildServiceProvider(); // allows us to actually get the configured services
             var authConfig = serviceProvider.GetService<IOptions<AuthConfig>>();
+            var dbConfig = serviceProvider.GetService<IOptions<DatabaseConfig>>();
 
             // Configure authentication
             services
@@ -62,14 +63,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
                     policy => policy.Requirements.Add(new HasScopeRequirement("write:cms", domain)));
             });
             
-            // Add Cross Origin Requests 
             services.AddCors();
-
-            services.AddDbContext<ToggleDbContext>(
-                options => options.UseNpgsql(AppConfig.BuildConnectionString(Configuration))
-            );
-            
-            // Add framework services.
+            services.AddDbContext<ToggleDbContext>(options => options.UseNpgsql(dbConfig.Value.ConnectionString));
             services.AddMvc();
 
             // Add managers
@@ -79,12 +74,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
-            IApplicationBuilder app,
-            IHostingEnvironment env,
-            ILoggerFactory loggerFactory,
-            IOptions<AppConfig> appConfig,
-            ToggleDbContext dbContext,
-            IOptions<AuthConfig> authConfig)
+            IApplicationBuilder app, IHostingEnvironment env,
+            ILoggerFactory loggerFactory, ToggleDbContext dbContext)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
 
