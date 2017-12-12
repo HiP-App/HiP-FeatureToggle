@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -5,20 +6,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.Swagger;
-
-using PaderbornUniversity.SILab.Hip.Webservice;
+using NSwag.AspNetCore;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
-using PaderbornUniversity.SILab.Hip.FeatureToggle.Services;
+using PaderbornUniversity.SILab.Hip.Webservice;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 {
     public class Startup
     {
-        private const string Version = "v1";
-        private const string Name = "HiP Feature Toggle API";
-
         public Startup(IHostingEnvironment env)
         {
             // load both the appsettings and the appsettings.Development /
@@ -38,82 +34,63 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
         {
             // Inject a configuration with the properties from AppConfig that
             // match the given Configuration (which was loaded in the constructor).
-            services.Configure<AppConfig>(Configuration);
+            services.Configure<PostgresDatabaseConfig>(Configuration.GetSection("Database"));
+            services.Configure<AuthConfig>(Configuration.GetSection("Auth"));
 
-            // Add Cross Orign Requests 
-            services.AddCors();
+            var serviceProvider = services.BuildServiceProvider(); // allows us to actually get the configured services
+            var authConfig = serviceProvider.GetService<IOptions<AuthConfig>>();
+            var dbConfig = serviceProvider.GetService<IOptions<PostgresDatabaseConfig>>();
 
-            services.AddDbContext<ToggleDbContext>(
-                options => options.UseNpgsql(AppConfig.BuildConnectionString(Configuration))
-            );
+            // Configure authentication
+            services
+                .AddAuthentication(options => options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.Audience = authConfig.Value.Audience;
+                    options.Authority = authConfig.Value.Authority;
+                });
 
-            // Register the Swagger generator
-            services.AddSwaggerGen(c =>
+            // Configure authorization
+            var domain = authConfig.Value.Authority;
+            services.AddAuthorization(options =>
             {
-                // Define a Swagger document
-                c.SwaggerDoc("v1", new Info() { Title = Name, Version = Version });
-                c.OperationFilter<CustomSwaggerOperationFilter>();
+                options.AddPolicy("read:featuretoggle",
+                    policy => policy.Requirements.Add(new HasScopeRequirement("read:featuretoggle", domain)));
+                options.AddPolicy("write:featuretoggle",
+                    policy => policy.Requirements.Add(new HasScopeRequirement("write:featuretoggle", domain)));
+                options.AddPolicy("write:cms",
+                    policy => policy.Requirements.Add(new HasScopeRequirement("write:cms", domain)));
             });
 
-            // Add framework services.
+            services.AddCors();
+            services.AddDbContext<ToggleDbContext>(options => options.UseNpgsql(dbConfig.Value.ConnectionString));
             services.AddMvc();
 
             // Add managers
             services.AddTransient<FeatureGroupsManager>();
             services.AddTransient<FeaturesManager>();
-            services.AddTransient<CmsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
-            IApplicationBuilder app,
-            IHostingEnvironment env,
-            ILoggerFactory loggerFactory,
-            IOptions<AppConfig> appConfig,
-            ToggleDbContext dbContext)
+            IApplicationBuilder app, IHostingEnvironment env,
+            ILoggerFactory loggerFactory, ToggleDbContext dbContext)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+
             if (env.IsDevelopment())
-            {
                 loggerFactory.AddDebug();
-            }
 
-            app.UseCors(builder =>
-                builder.AllowAnyHeader()
-                       .AllowAnyMethod()
-                       .AllowAnyOrigin()
-            );
+            app.UseRequestSchemeFixer();
 
-            // Configure JWT-based authentication using the configuration values from appsettings*.json
-            // TODO: Uncomment to re-enable authentication
-            //// Retrieve the AppConfig reference from the IOptions type:
-            //var config = appConfig.Value;
-            //app.UseJwtBearerAuthentication(new JwtBearerOptions
-            //{
-            //    Audience = config.CLIENT_ID,
-            //    Authority = config.DOMAIN,
-            //    AutomaticChallenge = true,
-            //    AutomaticAuthenticate = true,
-            //    RequireHttpsMetadata = !Convert.ToBoolean(config.ALLOW_HTTP),
-            //    Events = new BearerEvents()
-            //});
+            app.UseCors(builder => builder
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowAnyOrigin());
 
+            app.UseAuthentication();
             app.UseMvc();
-
-            // Swagger / Swashbuckle configuration:
-
-            // Enable middleware to serve generated Swagger as a JSON endpoint
-            app.UseSwagger(c =>
-            {
-                c.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.Host = httpReq.Host.Value);
-            });
-            // Configure SwaggerUI endpoint
-            app.UseSwaggerUI(c =>
-            {
-                // TODO: Only a hack, if HiP-Swagger is running, SwaggerUI can be disabled for Production
-                c.SwaggerEndpoint((env.IsDevelopment() ? "/swagger" : "..") +
-                                  "/" + Version + "/swagger.json", Name + Version);
-            });
+            app.UseSwaggerUiHip();
 
             // Run migrations
             dbContext.Database.Migrate();

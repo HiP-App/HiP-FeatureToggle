@@ -2,10 +2,10 @@
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Entity;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Models.Rest;
-using PaderbornUniversity.SILab.Hip.FeatureToggle.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 {
@@ -16,25 +16,22 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
     public class FeatureGroupsController : Controller
     {
         private readonly FeatureGroupsManager _manager;
-        private readonly CmsService _cmsService;
 
-        private bool IsAdministrator => _cmsService.GetUserRole(User) == "Administrator";
-
-        public FeatureGroupsController(FeatureGroupsManager manager, CmsService cmsService)
+        public FeatureGroupsController(FeatureGroupsManager manager)
         {
             _manager = manager;
-            _cmsService = cmsService;
         }
 
         /// <summary>
         /// Gets all feature groups.
         /// </summary>
+        [Authorize("read:featuretoggle")]
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<FeatureGroupResult>), 200)]
         [ProducesResponseType(403)]
         public IActionResult GetAll()
         {
-            if (!IsAdministrator)
+            if (!UserPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             var groups = _manager.GetAllGroups(loadMembers: true, loadFeatures: true);
@@ -45,12 +42,13 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// <summary>
         /// Gets a specific feature group by ID.
         /// </summary>
+        [Authorize("read:featuretoggle")]
         [HttpGet("{groupId}")]
         [ProducesResponseType(typeof(FeatureGroupResult), 200)]
         [ProducesResponseType(403)]
         public IActionResult GetById(int groupId)
         {
-            if (!IsAdministrator)
+            if (!UserPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             var group = _manager.GetGroup(groupId, loadMembers: true, loadFeatures: true);
@@ -65,14 +63,15 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// Stores a new feature group.
         /// </summary>
         /// <param name="groupArgs">Creation arguments</param>
+        [Authorize("write:featuretoggle")]
         [HttpPost]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(201)]
         [ProducesResponseType(403)]
         [ProducesResponseType(409)]
         [ProducesResponseType(422)]
         public IActionResult Create([FromBody]FeatureGroupArgs groupArgs)
         {
-            if (!IsAdministrator)
+            if (!UserPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             if (!ModelState.IsValid)
@@ -80,8 +79,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 
             try
             {
-                _manager.CreateGroup(groupArgs);
-                return Ok();
+                var group = _manager.CreateGroup(groupArgs);
+                return Created($"{Request.Scheme}://{Request.Host}/api/FeatureGroups/{group.Id}", group.Id);
             }
             catch (ResourceNotFoundException<Feature> e)
             {
@@ -96,14 +95,15 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// <summary>
         /// Deletes a feature group. Members are moved to the default group.
         /// </summary>
+        [Authorize("write:featuretoggle")]
         [HttpDelete("{groupId}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
         [ProducesResponseType(409)]
         public IActionResult Delete(int groupId)
         {
-            if (!IsAdministrator)
+            if (!UserPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             try
@@ -119,20 +119,21 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
                 return StatusCode(409, e.Message); // tried to delete protected group
             }
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
         /// Updates a feature group.
         /// </summary>
+        [Authorize("write:featuretoggle")]
         [HttpPut("{groupId}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
         public IActionResult Update(int groupId, [FromBody]FeatureGroupArgs groupArgs)
         {
-            if (!IsAdministrator)
+            if (!UserPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             if (!ModelState.IsValid)
@@ -141,7 +142,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             try
             {
                 _manager.UpdateGroup(groupId, groupArgs);
-                return Ok();
+                return NoContent();
             }
             catch (ResourceNotFoundException<FeatureGroup> e)
             {
@@ -166,14 +167,15 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
         /// Removes a user from its current feature group and assigns it to a new feature group.
         /// </summary>
         /// <returns></returns>
+        [Authorize("write:featuretoggle")]
         [HttpPut("/Api/Users/{userId}/FeatureGroup/{groupId}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
         [ProducesResponseType(409)]
         public IActionResult AssignMember(string userId, int groupId)
         {
-            if (!IsAdministrator)
+            if (!UserPermissions.IsAllowedToAdminister(User.Identity))
                 return Forbid();
 
             try
@@ -188,7 +190,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             {
                 return StatusCode(409, e.Message); // tried to move user to public group
             }
-            return Ok();
+            return NoContent();
         }
     }
 }
