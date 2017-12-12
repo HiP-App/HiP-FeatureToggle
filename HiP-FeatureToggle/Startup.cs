@@ -81,6 +81,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             if (env.IsDevelopment())
                 loggerFactory.AddDebug();
 
+            app.UseRequestSchemeFixer();
+
             app.UseCors(builder => builder
                 .AllowAnyHeader()
                 .AllowAnyMethod()
