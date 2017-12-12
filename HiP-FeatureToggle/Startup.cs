@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 using NSwag.AspNetCore;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
-using PaderbornUniversity.SILab.Hip.FeatureToggle.Utility;
 using PaderbornUniversity.SILab.Hip.Webservice;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle
@@ -35,12 +34,12 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
         {
             // Inject a configuration with the properties from AppConfig that
             // match the given Configuration (which was loaded in the constructor).
-            services.Configure<DatabaseConfig>(Configuration.GetSection("Database"));
+            services.Configure<PostgresDatabaseConfig>(Configuration.GetSection("Database"));
             services.Configure<AuthConfig>(Configuration.GetSection("Auth"));
 
             var serviceProvider = services.BuildServiceProvider(); // allows us to actually get the configured services
             var authConfig = serviceProvider.GetService<IOptions<AuthConfig>>();
-            var dbConfig = serviceProvider.GetService<IOptions<DatabaseConfig>>();
+            var dbConfig = serviceProvider.GetService<IOptions<PostgresDatabaseConfig>>();
 
             // Configure authentication
             services
@@ -62,7 +61,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
                 options.AddPolicy("write:cms",
                     policy => policy.Requirements.Add(new HasScopeRequirement("write:cms", domain)));
             });
-            
+
             services.AddCors();
             services.AddDbContext<ToggleDbContext>(options => options.UseNpgsql(dbConfig.Value.ConnectionString));
             services.AddMvc();
@@ -90,7 +89,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             app.UseAuthentication();
             app.UseMvc();
             app.UseSwaggerUiHip();
-            
+
             // Run migrations
             dbContext.Database.Migrate();
             ToggleDbInitializer.Initialize(dbContext);
