@@ -12,7 +12,7 @@ for a list of code contributions.
   * via Visual Studio: Open the solution (*.sln) and run the app (F5)
   * via Terminal: Execute `dotnet run` from the project folder (containing the *.csproj-file)
 
-The app is preconfigured to run on dev machines without any configuration (using the database on `localhost`). See [appsettings.json](https://github.com/HiP-App/HiP-FeatureToggle/blob/develop/HiP-FeatureToggle/appsettings.json) for a list of configuration fields and their default values.
+The app is preconfigured to run on dev machines without any manual configuration (using the database on `localhost`). See [appsettings.json](https://github.com/HiP-App/HiP-FeatureToggle/blob/develop/HiP-FeatureToggle/appsettings.json) for a list of configuration fields and their default values.
 
 # Core Concepts
 
