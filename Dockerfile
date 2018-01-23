@@ -5,7 +5,7 @@ RUN mkdir -p /dotnetapp
 COPY . /dotnetapp
 WORKDIR /dotnetapp/HiP-FeatureToggle
 
-EXPOSE 60000
+EXPOSE 60001
 
 RUN (echo "131.234.137.23 tfs-hip.cs.upb.de" >> /etc/hosts) && dotnet build
 
