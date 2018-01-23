@@ -11,7 +11,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseUrls("http://*:60000")
+                .UseUrls("http://*:60001")
                 .UseStartup<Startup>()
                 .UseApplicationInsights()
                 .Build();
