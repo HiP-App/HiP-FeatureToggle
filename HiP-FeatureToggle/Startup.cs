@@ -37,7 +37,7 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             // match the given Configuration (which was loaded in the constructor).
             services.Configure<PostgresDatabaseConfig>(Configuration.GetSection("Database"))
                     .Configure<AuthConfig>(Configuration.GetSection("Auth"))
-                    .Configure<LoggingConfig>(Configuration.GetSection("HiPLoggerConfig"))
+                    .Configure<LoggingConfig>(Configuration.GetSection("HiPLoggerConfig"));
 
             var serviceProvider = services.BuildServiceProvider(); // allows us to actually get the configured services
             var authConfig = serviceProvider.GetService<IOptions<AuthConfig>>();
