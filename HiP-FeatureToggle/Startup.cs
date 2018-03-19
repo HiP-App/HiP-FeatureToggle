@@ -10,6 +10,7 @@ using NSwag.AspNetCore;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Data;
 using PaderbornUniversity.SILab.Hip.FeatureToggle.Managers;
 using PaderbornUniversity.SILab.Hip.Webservice;
+using PaderbornUniversity.SILab.Hip.Webservice.Logging;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle
 {
@@ -34,8 +35,9 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
         {
             // Inject a configuration with the properties from AppConfig that
             // match the given Configuration (which was loaded in the constructor).
-            services.Configure<PostgresDatabaseConfig>(Configuration.GetSection("Database"));
-            services.Configure<AuthConfig>(Configuration.GetSection("Auth"));
+            services.Configure<PostgresDatabaseConfig>(Configuration.GetSection("Database"))
+                    .Configure<AuthConfig>(Configuration.GetSection("Auth"))
+                    .Configure<LoggingConfig>(Configuration.GetSection("HiPLoggerConfig"));
 
             var serviceProvider = services.BuildServiceProvider(); // allows us to actually get the configured services
             var authConfig = serviceProvider.GetService<IOptions<AuthConfig>>();
@@ -74,9 +76,10 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
             IApplicationBuilder app, IHostingEnvironment env,
-            ILoggerFactory loggerFactory, ToggleDbContext dbContext)
+            ILoggerFactory loggerFactory, ToggleDbContext dbContext, IOptions<LoggingConfig> loggingConfig)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"))
+                         .AddHipLogger(loggingConfig.Value); 
 
             if (env.IsDevelopment())
                 loggerFactory.AddDebug();
@@ -95,6 +98,8 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle
             // Run migrations
             dbContext.Database.Migrate();
             ToggleDbInitializer.Initialize(dbContext);
+
+            loggerFactory.CreateLogger("ApplicationStartup").LogInformation("FeatureToggle started successfully");
         }
     }
 }
