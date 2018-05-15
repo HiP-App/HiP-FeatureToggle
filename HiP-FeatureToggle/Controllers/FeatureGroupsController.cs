@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 
 namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
 {
@@ -84,11 +85,11 @@ namespace PaderbornUniversity.SILab.Hip.FeatureToggle.Controllers
             }
             catch (ResourceNotFoundException<Feature> e)
             {
-                return StatusCode(422, e.Message); // invalid feature ID
+                return StatusCode(422, e.Message); // Invalid feature ID
             }
             catch (ArgumentException e)
             {
-                return StatusCode(409, e.Message); // group with that name already exists
+                return StatusCode(409, e.Message); // Group with that name already exists
             }
         }
 
